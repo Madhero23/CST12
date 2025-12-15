@@ -1,0 +1,776 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+.product-window,
+.product-window * {
+  box-sizing: border-box;
+}
+.product-window {
+  background: #ffffff;
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.admin-products {
+  background: #f4f9fa;
+  flex-shrink: 0;
+  width: 1210px;
+  height: 1024px;
+  position: relative;
+}
+.container5 {
+  background: #ffffff;
+  border-style: solid;
+  border-color: rgba(95, 177, 183, 0.3);
+  border-width: 0px 0px 1.25px 0px;
+  padding: 23.98px 957.25px 23.98px 31.99px;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 1210px;
+  height: 113px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+.heading-1 {
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 57.6px;
+  position: relative;
+}
+.products2 {
+  color: #235c63;
+  text-align: left;
+  font-family: "Inter-Bold", sans-serif;
+  font-size: 48px;
+  line-height: 57.6px;
+  letter-spacing: 1.2px;
+  font-weight: 700;
+  position: relative;
+}
+.container6 {
+  background: #ffffff;
+  border-radius: 16px;
+  border-style: solid;
+  border-color: rgba(95, 177, 183, 0.3);
+  border-width: 1.25px;
+  padding: 33.24px 33.24px 1.25px 33.24px;
+  display: flex;
+  flex-direction: column;
+  gap: 31.99px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 1146.27px;
+  height: 523.03px;
+  position: absolute;
+  left: 31.99px;
+  top: 138.81px;
+  box-shadow: 0px 4px 6px -4px rgba(0, 0, 0, 0.1),
+    0px 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+.heading-2 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 23.98px;
+  position: relative;
+}
+.product-management {
+  color: #235c63;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.4px;
+  font-weight: 400;
+  position: absolute;
+  left: 0px;
+  top: -0.5px;
+}
+.container7 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 50.47px;
+  position: relative;
+}
+.container8 {
+  display: flex;
+  flex-direction: row;
+  gap: 11.99px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 211px;
+  height: 50px;
+  position: absolute;
+  left: 681.77px;
+  top: -0.03px;
+}
+.category-drop {
+  flex-shrink: 0;
+  width: 208px;
+  height: 50px;
+  position: relative;
+}
+.container9 {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  right: 0%;
+  left: 0%;
+  bottom: 0%;
+  top: 0%;
+}
+.dropdown {
+  background: #f4f9fa;
+  border-radius: 10px;
+  border-style: solid;
+  border-color: rgba(95, 177, 183, 0.3);
+  border-width: 1.25px;
+  padding: 1.25px;
+  width: 208px;
+  height: 50px;
+  position: absolute;
+  left: 0.45px;
+  top: 0.36px;
+}
+.all-categories {
+  color: #000000;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  position: absolute;
+  left: 9.55px;
+  top: 14.64px;
+}
+.v {
+  color: #000000;
+  text-align: left;
+  font-family: "Inter-SemiBold", sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  position: absolute;
+  left: 179.55px;
+  top: 12.64px;
+}
+.container10 {
+  width: 653px;
+  height: 50px;
+  position: absolute;
+  left: -0.23px;
+  top: -0.03px;
+}
+.text-input {
+  background: #f4f9fa;
+  border-radius: 10px;
+  border-style: solid;
+  border-color: rgba(95, 177, 183, 0.3);
+  border-width: 1.25px;
+  padding: 12px 16px 12px 48px;
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  align-items: center;
+  justify-content: flex-start;
+  width: 653.26px;
+  height: 50.47px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  overflow: hidden;
+}
+.search-products {
+  color: rgba(43, 43, 43, 0.5);
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  position: relative;
+}
+.icon8 {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  left: 16px;
+  top: 15.23px;
+  overflow: visible;
+}
+.button5 {
+  background: #2f7a85;
+  border-radius: 10px;
+  width: 170.29px;
+  height: 50px;
+  position: absolute;
+  left: 902.77px;
+  top: -0.03px;
+}
+.icon9 {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  left: 23.98px;
+  top: 15.23px;
+  overflow: visible;
+}
+.add-product {
+  color: #ffffff;
+  text-align: center;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  position: absolute;
+  left: 51.97px;
+  top: 12.74px;
+}
+.table {
+  flex-shrink: 0;
+  width: 1079.79px;
+  height: 318.11px;
+  position: relative;
+  overflow: hidden;
+}
+.table-header {
+  width: 1079.79px;
+  height: 40.61px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+.table-row {
+  border-style: solid;
+  border-color: rgba(95, 177, 183, 0.3);
+  border-width: 0px 0px 1.25px 0px;
+  padding: 0px 0px 1.25px 0px;
+  width: 1079.79px;
+  height: 40.61px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+.header-cell {
+  width: 398.67px;
+  height: 40.61px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+.product-name {
+  color: #235c63;
+  text-align: left;
+  font-family: "Inter-Bold", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 700;
+  position: absolute;
+  left: 0px;
+  top: -0.5px;
+}
+.header-cell2 {
+  width: 308.2px;
+  height: 40.61px;
+  position: absolute;
+  left: 398.67px;
+  top: 0px;
+}
+.category {
+  color: #235c63;
+  text-align: left;
+  font-family: "Inter-Bold", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 700;
+  position: absolute;
+  left: 0px;
+  top: -0.5px;
+}
+.header-cell3 {
+  width: 231.09px;
+  height: 40.61px;
+  position: absolute;
+  left: 706.88px;
+  top: 0px;
+}
+.availability {
+  color: #235c63;
+  text-align: left;
+  font-family: "Inter-Bold", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 700;
+  position: absolute;
+  left: 0px;
+  top: -0.5px;
+}
+.header-cell4 {
+  width: 141.82px;
+  height: 40.61px;
+  position: absolute;
+  left: 937.97px;
+  top: 0px;
+}
+.actions {
+  color: #235c63;
+  text-align: left;
+  font-family: "Inter-Bold", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 700;
+  position: absolute;
+  left: 0px;
+  top: -0.5px;
+}
+.table-body {
+  width: 1079.79px;
+  height: 276.88px;
+  position: absolute;
+  left: 0px;
+  top: 40.61px;
+}
+.table-row2 {
+  border-style: solid;
+  border-color: rgba(95, 177, 183, 0.2);
+  border-width: 0px 0px 1.25px 0px;
+  padding: 0px 0px 1.25px 0px;
+  width: 1079.79px;
+  height: 69.22px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+.table-cell {
+  width: 398.67px;
+  height: 69.22px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+.text12 {
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 220px;
+  height: 18.75px;
+  position: absolute;
+  left: 0px;
+  top: 25.12px;
+}
+.portable-ultrasound-machine {
+  color: #235c63;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  position: relative;
+}
+.table-cell2 {
+  width: 308.2px;
+  height: 69.22px;
+  position: absolute;
+  left: 398.67px;
+  top: 0px;
+}
+.text13 {
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 165.04px;
+  height: 18.75px;
+  position: absolute;
+  left: 0px;
+  top: 25.12px;
+}
+.diagnostic-equipment {
+  color: #0f172a;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  position: relative;
+}
+.table-cell3 {
+  width: 231.09px;
+  height: 69.22px;
+  position: absolute;
+  left: 706.88px;
+  top: 0px;
+}
+.text14 {
+  background: rgba(0, 201, 80, 0.2);
+  border-radius: 41943000px;
+  border-style: solid;
+  border-color: rgba(0, 201, 80, 0.3);
+  border-width: 1.25px;
+  padding: 1.25px;
+  width: 87.6px;
+  height: 34.45px;
+  position: absolute;
+  left: 0px;
+  top: 17.38px;
+}
+.in-stock {
+  color: #05df72;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  position: absolute;
+  left: 13.24px;
+  top: 4.73px;
+}
+.table-cell4 {
+  width: 141.82px;
+  height: 69.22px;
+  position: absolute;
+  left: 937.97px;
+  top: 0px;
+}
+.container11 {
+  display: flex;
+  flex-direction: row;
+  gap: 11.99px;
+  align-items: center;
+  justify-content: flex-start;
+  width: 141.82px;
+  height: 35.98px;
+  position: absolute;
+  left: 0px;
+  top: 16.62px;
+}
+.button6 {
+  border-radius: 10px;
+  padding: 7.99px 7.99px 0px 7.99px;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  width: 35.98px;
+  height: 35.98px;
+  position: relative;
+}
+.icon10 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 20px;
+  position: relative;
+  overflow: visible;
+}
+.icon11 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 20px;
+  position: relative;
+  overflow: visible;
+}
+.table-row3 {
+  border-style: solid;
+  border-color: rgba(95, 177, 183, 0.2);
+  border-width: 0px 0px 1.25px 0px;
+  padding: 0px 0px 1.25px 0px;
+  width: 1079.79px;
+  height: 69.22px;
+  position: absolute;
+  left: 0px;
+  top: 69.22px;
+}
+.text15 {
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 114.9px;
+  height: 18.75px;
+  position: absolute;
+  left: 0px;
+  top: 25.12px;
+}
+.patient-monitor {
+  color: #235c63;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  position: relative;
+}
+.text16 {
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 166.45px;
+  height: 18.75px;
+  position: absolute;
+  left: 0px;
+  top: 25.12px;
+}
+.monitoring-equipment {
+  color: #0f172a;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  position: relative;
+}
+.text17 {
+  background: rgba(240, 177, 0, 0.2);
+  border-radius: 41943000px;
+  border-style: solid;
+  border-color: rgba(240, 177, 0, 0.3);
+  border-width: 1.25px;
+  padding: 1.25px;
+  width: 105.29px;
+  height: 34.45px;
+  position: absolute;
+  left: 0px;
+  top: 17.38px;
+}
+.low-stock {
+  color: #fdc700;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  position: absolute;
+  left: 13.24px;
+  top: 4.73px;
+}
+.icon12 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 20px;
+  position: relative;
+  overflow: visible;
+}
+.icon13 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 20px;
+  position: relative;
+  overflow: visible;
+}
+.table-row4 {
+  border-style: solid;
+  border-color: rgba(95, 177, 183, 0.2);
+  border-width: 0px 0px 1.25px 0px;
+  padding: 0px 0px 1.25px 0px;
+  width: 1079.79px;
+  height: 69.22px;
+  position: absolute;
+  left: 0px;
+  top: 138.44px;
+}
+.text18 {
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 184.39px;
+  height: 18.75px;
+  position: absolute;
+  left: 0px;
+  top: 25.12px;
+}
+.surgical-instruments-set {
+  color: #235c63;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  position: relative;
+}
+.text19 {
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 146.41px;
+  height: 18.75px;
+  position: absolute;
+  left: 0px;
+  top: 25.12px;
+}
+.surgical-equipment {
+  color: #0f172a;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  position: relative;
+}
+.icon14 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 20px;
+  position: relative;
+  overflow: visible;
+}
+.icon15 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 20px;
+  position: relative;
+  overflow: visible;
+}
+.table-row5 {
+  border-style: solid;
+  border-color: rgba(95, 177, 183, 0.2);
+  border-width: 0px 0px 1.25px 0px;
+  padding: 0px 0px 1.25px 0px;
+  width: 1079.79px;
+  height: 69.22px;
+  position: absolute;
+  left: 0px;
+  top: 207.66px;
+}
+.text20 {
+  display: flex;
+  flex-direction: row;
+  gap: 0px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 154.57px;
+  height: 18.75px;
+  position: absolute;
+  left: 0px;
+  top: 25.12px;
+}
+.digital-thermometer {
+  color: #235c63;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  position: relative;
+}
+.text21 {
+  background: rgba(251, 44, 54, 0.2);
+  border-radius: 41943000px;
+  border-style: solid;
+  border-color: rgba(251, 44, 54, 0.3);
+  border-width: 1.25px;
+  padding: 1.25px;
+  width: 120.8px;
+  height: 34.45px;
+  position: absolute;
+  left: 0px;
+  top: 17.38px;
+}
+.out-of-stock {
+  color: #ff6467;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  position: absolute;
+  left: 13.24px;
+  top: 4.73px;
+}
+.icon16 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 20px;
+  position: relative;
+  overflow: visible;
+}
+.icon17 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 20px;
+  position: relative;
+  overflow: visible;
+}
+.icon18 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 20px;
+  position: relative;
+  overflow: visible;
+}
+.icon19 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 20px;
+  position: relative;
+  overflow: visible;
+}
+.icon20 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 20px;
+  position: relative;
+  overflow: visible;
+}
+.icon21 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 20px;
+  position: relative;
+  overflow: visible;
+}
+.icon22 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 20px;
+  position: relative;
+  overflow: visible;
+}
+.icon23 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 20px;
+  position: relative;
+  overflow: visible;
+}
+.icon24 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 20px;
+  position: relative;
+  overflow: visible;
+}
+.icon25 {
+  align-self: stretch;
+  flex-shrink: 0;
+  height: 20px;
+  position: relative;
+  overflow: visible;
+}
