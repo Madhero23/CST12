@@ -1,69 +1,63 @@
-<div class="sidebar">
-  <div class="container">
-    <div class="container2">
-      <img class="image-roz-med-logo" src="image-roz-med-logo0.png" />
-      <div class="container3">
-        <div class="text">
-          <div class="text2">
-            <div class="roz">Roz</div>
-          </div>
-          <div class="text3">
-            <div class="med">MED</div>
-          </div>
+@php
+    // Define the current route name
+    $currentRoute = Route::currentRouteName();
+    
+    // Define navigation items with their routes
+    $navItems = [
+        'admin' => [
+            'route' => 'admin',
+            'name' => 'Dashboard',
+            'icon' => 'icon6.svg'
+        ],
+        'products' => [
+            'route' => 'products',
+            'name' => 'Products',
+            'icon' => 'icon7.svg'
+        ],
+        'inventory' => [
+            'route' => 'inventory',
+            'name' => 'Inventory',
+            'icon' => 'icon8.svg'
+        ],
+        'customers' => [
+            'route' => 'customers',
+            'name' => 'Customers',
+            'icon' => 'icon9.svg'
+        ],
+        'finance' => [
+            'route' => 'finance',
+            'name' => 'Finance',
+            'icon' => 'icon10.svg'
+        ],
+        'documents' => [
+            'route' => 'documents',
+            'name' => 'Documents',
+            'icon' => 'icon11.svg'
+        ]
+    ];
+@endphp
+
+<div class="admin-sidebar">
+    <div class="sidebar-header">
+        <div class="logo-container">
+            <img class="logo-image" src="{{ asset('image-roz-med-logo0.png') }}" alt="RozMed Logo">
+            <div class="logo-text">
+                <div class="logo-main">
+                    <span class="roz">Roz</span>
+                    <span class="med">MED</span>
+                </div>
+                <div class="logo-subtitle">ENTERPRISE, INC.</div>
+            </div>
         </div>
-        <div class="text4">
-          <div class="enterprise-inc">ENTERPRISE, INC.</div>
-        </div>
-      </div>
     </div>
-  </div>
-  <div class="container4">
-    <div class="button">
-      <img class="icon" src="icon0.svg" />
-      <div class="text5">
-        <div class="logout">Logout</div>
-      </div>
-    </div>
-  </div>
-  <div class="navigation">
-    <div class="d-bb">
-      <div class="rectangle-1"></div>
-      <div class="button2">
-        <img class="icon2" src="icon1.svg" />
-        <div class="text6">
-          <div class="dashboard">Dashboard</div>
-        </div>
-      </div>
-    </div>
-    <div class="button3">
-      <img class="icon3" src="icon2.svg" />
-      <div class="text7">
-        <div class="products">Products</div>
-      </div>
-    </div>
-    <div class="button3">
-      <img class="icon4" src="icon3.svg" />
-      <div class="text8">
-        <div class="inventory">Inventory</div>
-      </div>
-    </div>
-    <div class="button3">
-      <img class="icon5" src="icon4.svg" />
-      <div class="text9">
-        <div class="customers">Customers</div>
-      </div>
-    </div>
-    <div class="button3">
-      <img class="icon6" src="icon5.svg" />
-      <div class="text10">
-        <div class="finance">Finance</div>
-      </div>
-    </div>
-    <div class="button3">
-      <img class="icon7" src="icon6.svg" />
-      <div class="text11">
-        <div class="documents">Documents</div>
-      </div>
-    </div>
-  </div>
+    
+    <nav class="sidebar-navigation">
+        @foreach($navItems as $key => $item)
+            <a href="{{ route($item['route']) }}" 
+               class="nav-item {{ $currentRoute === $item['route'] ? 'active' : '' }}">
+                <img class="nav-icon" src="{{ asset($item['icon']) }}" alt="{{ $item['name'] }}">
+                <span class="nav-text">{{ $item['name'] }}</span>
+            </a>
+        @endforeach
+    </nav>
 </div>

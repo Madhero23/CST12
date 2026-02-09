@@ -8,6 +8,12 @@
     <h1>Welcome to the Project</h1>
     <p>This is the welcome page of the project.</p>
 
+    <div>
     <a href="/index" class="btn">Go to Home Page</a>
+    </div>
+    <div>
+    <a href="/admin" class="btn">Go to Admin Page</a>
+    </div>
+
 </body>
 </html>
