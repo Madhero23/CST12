@@ -21,14 +21,14 @@
                     exceptional patient care.
                 </p>
                 <div class="hero-buttons">
-                    <button class="btn btn-primary">
+                    <a href="{{ route('product') }}" class="btn btn-primary">
                         <img class="btn-icon" src="{{ asset('icon8.svg') }}" alt="Browse Products" />
                         <span>Browse Products</span>
-                    </button>
-                    <button class="btn btn-secondary">
+                    </a>
+                    <a href="{{ route('contact') }}" class="btn btn-secondary">
                         <img class="btn-icon" src="{{ asset('icon9.svg') }}" alt="Contact Sales" />
                         <span>Contact Sales</span>
-                    </button>
+                    </a>
                 </div>
             </div>
             
@@ -62,7 +62,7 @@
                     <div class="card-content">
                         <h3 class="card-title">{{ $equipment['title'] }}</h3>
                         <p class="card-description">{{ $equipment['desc'] }}</p>
-                        <a href="#" class="card-link">
+                        <a href="{{ route('product', ['id' => $index + 1]) }}" class="card-link">
                             <span>View More</span>
                             <img class="link-icon" src="{{ asset('icon' . ($index + 11) . '.svg') }}" alt="View More" />
                         </a>
