@@ -7,10 +7,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
+
+    protected $primaryKey = 'User_ID';
 
     /**
      * The attributes that are mass assignable.
@@ -18,9 +22,15 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'Username',
+        'Email',
+        'Password_Hash',
+        'Role',
+        'Full_Name',
+        'Phone',
+        'Department',
+        'Last_Login',
+        'Status',
     ];
 
     /**
@@ -29,7 +39,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $hidden = [
-        'password',
+        'Password_Hash',
         'remember_token',
     ];
 
@@ -41,8 +51,8 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'Last_Login' => 'datetime',
+            'Password_Hash' => 'hashed',
         ];
     }
 }

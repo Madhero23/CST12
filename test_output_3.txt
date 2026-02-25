@@ -1,0 +1,10 @@
+
+   PASS  Tests\Feature\InventoryTest
+  Γ£ô stock in increases inventory and logs transaction                                                           18.90s  
+  Γ£ô stock out decreases inventory and logs transaction                                                           0.26s  
+  Γ£ô stock transfer moves inventory correctly                                                                     0.22s  
+  Γ£ô insufficient stock prevents stock out and transfer                                                           0.18s  
+
+  Tests:    4 passed (13 assertions)
+  Duration: 22.55s
+

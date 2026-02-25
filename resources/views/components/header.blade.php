@@ -15,9 +15,9 @@
                 $currentRoute = Route::currentRouteName();
                 $routes = [
                     'home' => ['route' => 'home.index', 'text' => 'Home'],
-                    'products' => ['route' => 'product', 'text' => 'Products'],
+                    'products' => ['route' => 'products.index', 'text' => 'Products'],
                     'about' => ['route' => 'about', 'text' => 'About Us'],
-                    'contact' => ['route' => 'contact', 'text' => 'Contact']
+                    'contact' => ['route' => 'contact.index', 'text' => 'Contact']
                 ];
             @endphp
             

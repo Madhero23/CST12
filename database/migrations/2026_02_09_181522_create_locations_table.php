@@ -13,10 +13,10 @@ return new class extends Migration
             $table->string('Location_Name');
             $table->text('Address');
             $table->string('Contact_Number');
-            $table->enum('Status', ['Active', 'Inactive', 'Under Maintenance'])->default('Active');
+            $table->enum('Status', ['Active', 'Inactive', 'UnderMaintenance'])->default('Active');
             $table->foreignId('Manager_ID')->nullable()->constrained('users', 'User_ID');
-            $table->date('Created_Date')->useCurrent();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

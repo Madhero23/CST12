@@ -15,10 +15,12 @@ return new class extends Migration
             $table->string('Email');
             $table->string('Phone');
             $table->text('Address');
+            $table->string('Country')->default('Philippines');
             $table->string('Specialization')->nullable();
             $table->integer('Years_In_Service')->nullable();
             $table->enum('Status', ['Active', 'Inactive'])->default('Active');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->date('Effective_Date')->useCurrent();
             $table->enum('Source', ['BSP', 'Manual', 'API']);
             $table->timestamps();
+            $table->softDeletes();
             
             $table->index('Effective_Date');
         });

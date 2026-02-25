@@ -10,27 +10,22 @@ return new class extends Migration
     {
         Schema::create('alert_logs', function (Blueprint $table) {
             $table->id('Alert_ID');
-            $table->enum('Alert_Type', [
-                'LowStock', 
-                'PaymentDue', 
-                'AgingStock', 
-                'Replenishment', 
-                'QuotationExpiry', 
-                'CertificateExpiry'
-            ]);
-            $table->enum('Entity_Type', ['Product', 'Customer', 'Quotation', 'Payment', 'Document']);
-            $table->unsignedBigInteger('Entity_ID');
-            $table->text('Alert_Message');
-            $table->enum('Priority_Level', ['Low', 'Medium', 'High', 'Critical']);
-            $table->timestamp('Generated_Date')->useCurrent();
-            $table->foreignId('Acknowledged_By')->nullable()->constrained('users', 'User_ID');
-            $table->timestamp('Acknowledged_Date')->nullable();
-            $table->enum('Resolution_Status', ['Open', 'Acknowledged', 'Resolved', 'Dismissed'])->default('Open');
-            $table->timestamp('Created_Date')->useCurrent();
+            $table->enum('Alert_Type', ['Security', 'System', 'Maintenance', 'Inventory', 'Sales']);
+            $table->string('Subject');
+            $table->text('Message');
+            $table->enum('Severity', ['Low', 'Medium', 'High', 'Critical'])->default('Medium');
+            $table->boolean('Is_Read')->default(false);
+            $table->foreignId('Read_By')->nullable()->constrained('users', 'User_ID');
+            $table->timestamp('Read_Date')->nullable();
+            $table->enum('Resolution_Status', ['Unresolved', 'InProgress', 'Resolved', 'Dismissed'])->default('Unresolved');
+            $table->enum('Related_Entity_Type', ['Product', 'Quotation', 'Customer', 'User', 'Sale', 'Document'])->nullable();
+            $table->unsignedBigInteger('Related_Entity_ID')->nullable();
             $table->timestamps();
+            $table->softDeletes();
             
-            $table->index('Resolution_Status');
+            $table->index(['Related_Entity_Type', 'Related_Entity_ID']);
             $table->index('Alert_Type');
+            $table->index('Severity');
         });
     }
 

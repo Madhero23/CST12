@@ -1,0 +1,57 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Models\Product; // Add this at the top
+use App\Http\Controllers\ProductController;
+
+// user routes
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/index', function () {
+    return view('home.index');
+})->name('home.index');
+
+// Updated products route to fetch from database
+Route::get('/products', [ProductController::class, 'index'])->name('product');
+
+
+Route::get('/about', function () {
+    return view('about.about');
+})->name('about');
+
+Route::get('/contact', function () {
+    return view('contact.contact');
+})->name('contact');
+
+Route::post('/contact/inquiry', [ProductController::class, 'storeInquiry'])->name('contact.inquiry');
+
+// Updated product details route
+Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.details');
+
+
+// admin routes
+Route::get('/admin', function () {
+    return view('dashboard.admin');
+})->name('admin');
+
+Route::get('/productdetail', function () {
+    return view('productdetails.PDetails');
+})->name('products');
+
+Route::get('/inventory', function () {
+    return view('inventory.inventory');
+})->name('inventory');
+
+Route::get('/customers', function () {
+    return view('customer.customer');
+})->name('customers');
+
+Route::get('/finance', function () {
+    return view('finance.finance');
+})->name('finance');
+
+Route::get('/document', function () {
+    return view('document.document');
+})->name('documents');

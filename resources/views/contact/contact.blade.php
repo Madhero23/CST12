@@ -23,15 +23,21 @@
                             <div class="form-card">
                                 <h2 class="form-title">Send us a Message</h2>
                                 
-                                <form class="contact-form" id="contactForm">
+                                <form class="contact-form" id="contactForm" method="POST" action="{{ route('contact.inquiry') }}">
+                                    @csrf
+                                    
                                     <div class="form-group">
-                                        <label for="fullName" class="form-label">Full Name</label>
+                                        <label for="name" class="form-label">Full Name</label>
                                         <input type="text" 
-                                               id="fullName" 
-                                               name="fullName"
+                                               id="name" 
+                                               name="name"
                                                placeholder="John Doe"
                                                class="form-input"
+                                               value="{{ old('name') }}"
                                                required>
+                                        @error('name')
+                                            <span class="error-message">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                     
                                     <div class="form-row">
@@ -42,7 +48,11 @@
                                                    name="email"
                                                    placeholder="john@example.com"
                                                    class="form-input"
+                                                   value="{{ old('email') }}"
                                                    required>
+                                            @error('email')
+                                                <span class="error-message">{{ $message }}</span>
+                                            @enderror
                                         </div>
                                         
                                         <div class="form-group">
@@ -52,8 +62,24 @@
                                                    name="phone"
                                                    placeholder="+1 (555) 000-0000"
                                                    class="form-input"
-                                                   required>
+                                                   value="{{ old('phone') }}">
+                                            @error('phone')
+                                                <span class="error-message">{{ $message }}</span>
+                                            @enderror
                                         </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="company" class="form-label">Company (Optional)</label>
+                                        <input type="text" 
+                                               id="company" 
+                                               name="company"
+                                               placeholder="Your Company Name"
+                                               class="form-input"
+                                               value="{{ old('company') }}">
+                                        @error('company')
+                                            <span class="error-message">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                     
                                     <div class="form-group">
@@ -63,7 +89,11 @@
                                                name="subject"
                                                placeholder="Equipment inquiry, support request, etc."
                                                class="form-input"
+                                               value="{{ old('subject') }}"
                                                required>
+                                        @error('subject')
+                                            <span class="error-message">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                     
                                     <div class="form-group">
@@ -73,7 +103,10 @@
                                                   placeholder="Tell us how we can help you..."
                                                   class="form-textarea"
                                                   rows="5"
-                                                  required></textarea>
+                                                  required>{{ old('message') }}</textarea>
+                                        @error('message')
+                                            <span class="error-message">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                     
                                     <button type="submit" class="submit-btn">
@@ -177,49 +210,102 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Show loading state
         submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
         btnText.style.opacity = '0';
         btnLoader.style.display = 'flex';
         
+        // Clear previous error messages
+        document.querySelectorAll('.error-message').forEach(el => el.remove());
+        document.querySelectorAll('.form-input, .form-textarea').forEach(el => {
+            el.classList.remove('error');
+        });
+        
         // Get form data
         const formData = new FormData(this);
-        const data = Object.fromEntries(formData);
         
-        // Simulate form submission (replace with actual AJAX call)
-        setTimeout(() => {
-            // Show success state
-            submitBtn.classList.remove('loading');
-            submitBtn.classList.add('success');
-            btnLoader.style.display = 'none';
-            btnText.textContent = 'Message Sent!';
-            btnText.style.opacity = '1';
-            
-            // Add checkmark animation
-            const checkmark = document.createElement('div');
-            checkmark.className = 'checkmark';
-            checkmark.innerHTML = `
-                <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-                    <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
-                    <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-                </svg>
-            `;
-            submitBtn.appendChild(checkmark);
-            
-            // Show success notification
-            showNotification('Your message has been sent successfully!', 'success');
-            
-            // Reset form after delay
-            setTimeout(() => {
-                contactForm.reset();
-                submitBtn.classList.remove('success');
-                btnText.textContent = 'Send Message';
-                checkmark.remove();
+        // Submit to backend
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success state
+                submitBtn.classList.remove('loading');
+                submitBtn.classList.add('success');
+                btnLoader.style.display = 'none';
+                btnText.textContent = 'Message Sent!';
+                btnText.style.opacity = '1';
                 
-                // Reset button state
+                // Add checkmark animation
+                const checkmark = document.createElement('div');
+                checkmark.className = 'checkmark';
+                checkmark.innerHTML = `
+                    <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                        <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                        <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                    </svg>
+                `;
+                submitBtn.appendChild(checkmark);
+                
+                // Show success notification
+                showNotification(data.message || 'Your message has been sent successfully!', 'success');
+                
+                // Reset form after delay
                 setTimeout(() => {
-                    btnText.style.opacity = '1';
-                }, 300);
-            }, 3000);
-        }, 1500);
+                    contactForm.reset();
+                    submitBtn.classList.remove('success');
+                    submitBtn.disabled = false;
+                    btnText.textContent = 'Send Message';
+                    checkmark.remove();
+                    
+                    // Reset button state
+                    setTimeout(() => {
+                        btnText.style.opacity = '1';
+                    }, 300);
+                }, 3000);
+            } else {
+                // Handle validation errors
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+                btnText.style.opacity = '1';
+                btnLoader.style.display = 'none';
+                
+                if (data.errors) {
+                    // Display field-specific errors
+                    Object.keys(data.errors).forEach(field => {
+                        const input = contactForm.querySelector(`[name="${field}"]`);
+                        if (input) {
+                            input.classList.add('error');
+                            const errorSpan = document.createElement('span');
+                            errorSpan.className = 'error-message';
+                            errorSpan.textContent = data.errors[field][0];
+                            input.parentElement.appendChild(errorSpan);
+                        }
+                    });
+                    
+                    showNotification(data.message || 'Please check your input and try again.', 'error');
+                } else {
+                    showNotification(data.message || 'An error occurred. Please try again.', 'error');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            
+            // Show error state
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+            btnText.style.opacity = '1';
+            btnLoader.style.display = 'none';
+            
+            showNotification('Failed to submit your inquiry. Please try again later or contact us directly.', 'error');
+        });
     });
     
     // Form input focus effects

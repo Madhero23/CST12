@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id('Interaction_ID');
             $table->foreignId('Customer_ID')->constrained('customers', 'Customer_ID');
             $table->foreignId('User_ID')->constrained('users', 'User_ID');
-            $table->enum('Interaction_Type', ['Call', 'Email', 'Meeting', 'WhatsApp', 'SMS', 'Site Visit']);
+            $table->enum('Interaction_Type', ['Call', 'Email', 'Meeting', 'WhatsApp', 'SMS', 'SiteVisit']);
             $table->timestamp('Interaction_Date')->useCurrent();
             $table->string('Subject');
             $table->text('Details');
@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum('Status', ['Completed', 'Pending', 'Cancelled'])->default('Completed');
             $table->integer('Duration_Minutes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
             
             $table->index('Customer_ID');
             $table->index('Interaction_Date');

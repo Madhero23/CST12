@@ -17,8 +17,8 @@ return new class extends Migration
             $table->date('Start_Date');
             $table->date('End_Date');
             $table->enum('Status', ['Active', 'Completed', 'Overdue', 'Cancelled'])->default('Active');
-            $table->timestamp('Created_Date')->useCurrent();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

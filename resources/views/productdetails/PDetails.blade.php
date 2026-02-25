@@ -1,17 +1,15 @@
 @vite(['resources/css/PDetails.css'])
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <div class="admin-dashboard-container">
     @include('components.sidebar')
 
     <main class="admin-main-content">
-        <header class="dashboard-header">
-            <h1 class="dashboard-title">Products</h1>
-        </header>
+        <!-- Header Section -->
+        <div class="products-page-header">
+            <h1 class="products-main-title">Products</h1>
+        </div>
         
         <div class="admin-products">
-            <!-- Header Section -->
-            <div class="products-header">
-                <h2 class="products-main-title">Products</h2>
-            </div>
             
             <!-- Product Management Section -->
             <div class="product-management-card">
@@ -23,7 +21,7 @@
                 <div class="management-controls">
                     <div class="search-container">
                         <div class="search-input-wrapper">
-                            <img class="search-icon" src="{{ asset('icon0.svg') }}" alt="Search">
+                            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                             <input type="text" class="search-input" placeholder="Search products...">
                         </div>
                     </div>
@@ -31,14 +29,24 @@
                     <div class="filter-container">
                         <select class="category-filter">
                             <option value="all">All Categories</option>
-                            <option value="diagnostic">Diagnostic Equipment</option>
-                            <option value="monitoring">Monitoring Equipment</option>
-                            <option value="surgical">Surgical Equipment</option>
+                            @php
+                                $categories = [
+                                    'DiagnosticEquipment' => 'Diagnostic Equipment',
+                                    'MedicalInstruments' => 'Medical Instruments',
+                                    'MonitoringDevices' => 'Monitoring Devices',
+                                    'EmergencyEquipment' => 'Emergency Equipment',
+                                    'InfusionSystems' => 'Infusion Systems',
+                                    'LaboratoryEquipment' => 'Laboratory Equipment'
+                                ];
+                            @endphp
+                            @foreach($categories as $value => $label)
+                                <option value="{{ $value }}">{{ $label }}</option>
+                            @endforeach
                         </select>
                     </div>
                     
                     <button class="add-product-btn">
-                        <img class="btn-icon" src="{{ asset('icon1.svg') }}" alt="Add">
+                        <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         <span>Add Product</span>
                     </button>
                 </div>
@@ -55,84 +63,52 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @php
-                                $products = [
-                                    [
-                                        'name' => 'Portable Ultrasound Machine',
-                                        'category' => 'Diagnostic Equipment',
-                                        'availability' => 'in-stock',
-                                        'availability_text' => 'In Stock'
-                                    ],
-                                    [
-                                        'name' => 'Patient Monitor',
-                                        'category' => 'Monitoring Equipment',
-                                        'availability' => 'low-stock',
-                                        'availability_text' => 'Low Stock'
-                                    ],
-                                    [
-                                        'name' => 'Surgical Instruments Set',
-                                        'category' => 'Surgical Equipment',
-                                        'availability' => 'in-stock',
-                                        'availability_text' => 'In Stock'
-                                    ],
-                                    [
-                                        'name' => 'Digital Thermometer',
-                                        'category' => 'Diagnostic Equipment',
-                                        'availability' => 'out-of-stock',
-                                        'availability_text' => 'Out of Stock'
-                                    ],
-                                    [
-                                        'name' => 'Portable Ultrasound Machine',
-                                        'category' => 'Diagnostic Equipment',
-                                        'availability' => 'in-stock',
-                                        'availability_text' => 'In Stock'
-                                    ],
-                                    [
-                                        'name' => 'Patient Monitor',
-                                        'category' => 'Monitoring Equipment',
-                                        'availability' => 'low-stock',
-                                        'availability_text' => 'Low Stock'
-                                    ],
-                                    [
-                                        'name' => 'Surgical Instruments Set',
-                                        'category' => 'Surgical Equipment',
-                                        'availability' => 'in-stock',
-                                        'availability_text' => 'In Stock'
-                                    ],
-                                    [
-                                        'name' => 'Digital Thermometer',
-                                        'category' => 'Diagnostic Equipment',
-                                        'availability' => 'out-of-stock',
-                                        'availability_text' => 'Out of Stock'
-                                    ],
-                                ];
-                            @endphp
-                            
-                            @foreach($products as $index => $product)
-                            <tr class="table-row" data-animation-delay="{{ $index * 0.1 }}">
+                            @forelse($products as $index => $product)
+                            <tr class="table-row" data-product-id="{{ $product->Product_ID }}" data-category="{{ $product->Category }}">
                                 <td class="table-cell product-name-cell">
-                                    <span class="product-name">{{ $product['name'] }}</span>
+                                    <span class="product-name">{{ $product->Product_Name }}</span>
                                 </td>
                                 <td class="table-cell category-cell">
-                                    <span class="category-text">{{ $product['category'] }}</span>
+                                    <span class="category-text">{{ $categories[$product->Category] ?? $product->Category }}</span>
                                 </td>
                                 <td class="table-cell availability-cell">
-                                    <span class="availability-badge {{ $product['availability'] }}">
-                                        {{ $product['availability_text'] }}
+                                    @php
+                                        // Logic for availability matching Image 1 pills
+                                        $availabilityClass = 'in-stock';
+                                        $availabilityText = 'In Stock';
+                                        
+                                        // Simple logic based on stock (assuming Product has enough fields or we use Inventory)
+                                        // For now using placeholder logic as per previous version but styled better
+                                        if (($product->Quantity_On_Hand ?? 0) <= 0) {
+                                            $availabilityClass = 'out-of-stock';
+                                            $availabilityText = 'Out of Stock';
+                                        } elseif (($product->Quantity_On_Hand ?? 0) < 10) {
+                                            $availabilityClass = 'low-stock';
+                                            $availabilityText = 'Low Stock';
+                                        }
+                                    @endphp
+                                    <span class="availability-badge {{ $availabilityClass }}">
+                                        {{ $availabilityText }}
                                     </span>
                                 </td>
                                 <td class="table-cell actions-cell">
                                     <div class="action-buttons">
-                                        <button class="action-btn edit-btn" title="Edit">
-                                            <img src="{{ asset('icon' . ($index * 2 + 2) . '.svg') }}" alt="Edit">
+                                        <button class="action-btn edit-btn" title="Edit" data-product-id="{{ $product->Product_ID }}">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2F7A85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                         </button>
-                                        <button class="action-btn delete-btn" title="Delete">
-                                            <img src="{{ asset('icon' . ($index * 2 + 3) . '.svg') }}" alt="Delete">
+                                        <button class="action-btn delete-btn" title="Delete" data-product-id="{{ $product->Product_ID }}">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                                         </button>
                                     </div>
                                 </td>
                             </tr>
-                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="4" class="no-results">
+                                    No products found.
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -141,8 +117,353 @@
     </main>
 </div>
 
-@push('scripts')
+<!-- Add Product Modal -->
+<div id="addProductModal" class="modal" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content add-modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Add New Product</h2>
+            <button class="modal-close" onclick="closeModal('addProductModal')">&times;</button>
+        </div>
+        
+        <form id="addProductForm" class="modal-form">
+            @csrf
+            
+            <div class="form-group">
+                <label class="form-label">Product Name</label>
+                <input type="text" name="Product_Name" class="form-input" placeholder="Enter product name" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <div class="select-wrapper">
+                    <select name="Category" class="form-select" required>
+                        <option value="" disabled selected>Select Category...</option>
+                        @foreach($categories as $value => $label)
+                            <option value="{{ $value }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group flex-1">
+                    <label class="form-label">Price (PhP)</label>
+                    <input type="number" name="Unit_Price_PHP" class="form-input" placeholder="0.00" step="0.01" min="0" required>
+                </div>
+                <div class="form-group flex-1">
+                    <label class="form-label">Initial Stock</label>
+                    <input type="number" name="Stock_Quantity" class="form-input" placeholder="Quantity" min="0" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea name="Description" class="form-textarea" placeholder="Product description..." rows="4" required></textarea>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeModal('addProductModal')">Cancel</button>
+                <button type="submit" class="btn-submit">Add Product</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Product Modal -->
+<div id="editProductModal" class="modal" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content edit-modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Edit Product</h2>
+            <button class="modal-close" onclick="closeModal('editProductModal')">&times;</button>
+        </div>
+        
+        <form id="editProductForm" class="modal-form">
+            @csrf
+            @method('PUT')
+            <input type="hidden" id="edit_product_id" name="product_id">
+            
+            <div class="form-group">
+                <label class="form-label">Product Name</label>
+                <input type="text" id="edit_product_name" name="Product_Name" class="form-input" placeholder="Enter product name" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <div class="select-wrapper">
+                    <select id="edit_category" name="Category" class="form-select" required>
+                        <option value="" disabled>Select Category...</option>
+                        @foreach($categories as $value => $label)
+                            <option value="{{ $value }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Availability</label>
+                <div class="select-wrapper">
+                    <select id="edit_status" name="Status" class="form-select" required>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Discontinued">Discontinued</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group flex-1">
+                    <label class="form-label">Price (PhP)</label>
+                    <input type="number" id="edit_price_php" name="Unit_Price_PHP" class="form-input" placeholder="0.00" step="0.01" min="0" required>
+                </div>
+                <div class="form-group flex-1">
+                    <label class="form-label">Stock Quantity</label>
+                    <input type="number" id="edit_stock_quantity" name="Stock_Quantity" class="form-input" placeholder="Quantity" min="0" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea id="edit_description" name="Description" class="form-textarea" placeholder="Product description..." rows="4" required></textarea>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeModal('editProductModal')">Cancel</button>
+                <button type="submit" class="btn-submit">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Product Modal -->
+<div id="deleteProductModal" class="modal" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content delete-modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Confirm Delete</h2>
+            <button class="modal-close" onclick="closeModal('deleteProductModal')">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="warning-alert">
+                <div class="warning-icon-wrapper">
+                    <svg class="warning-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 9V11M12 15H12.01M5.07183 19H18.9282C20.4678 19 21.4301 17.3333 20.6603 16L13.7321 4C12.9623 2.66667 11.0378 2.66667 10.268 4L3.33975 16C2.56995 17.3333 3.5322 19 5.07183 19Z" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="warning-content">
+                    <h4 class="warning-title">Warning</h4>
+                    <p class="warning-text">Are you sure you want to delete <strong id="delete_product_name"></strong>? This action cannot be undone.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel" onclick="closeModal('deleteProductModal')">Cancel</button>
+            <button type="button" class="btn-delete" id="confirmDeleteBtn">Delete</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #1f2937;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #2f7a85;
+    box-shadow: 0 0 0 3px rgba(47, 122, 133, 0.1);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-danger {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: #2f7a85;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #26646d;
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+.btn-danger {
+    background: #dc2626;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+}
+
+.text-warning {
+    color: #dc2626;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+</style>
+
+
+
 <script>
+// Modal helper functions
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+    // Reset forms when closing
+    const modal = document.getElementById(modalId);
+    const form = modal.querySelector('form');
+    if (form) {
+        form.reset();
+    }
+}
+
+// Close modal when clicking overlay
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-overlay')) {
+        const modal = e.target.closest('.modal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     // Table row animation
     const tableRows = document.querySelectorAll('.table-row');
@@ -217,12 +538,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const rows = document.querySelectorAll('.table-row');
         
         rows.forEach(row => {
-            const category = row.querySelector('.category-text').textContent.toLowerCase();
+            const category = row.dataset.category;
             
-            if (selectedCategory === 'all' || 
-                (selectedCategory === 'diagnostic' && category.includes('diagnostic')) ||
-                (selectedCategory === 'monitoring' && category.includes('monitoring')) ||
-                (selectedCategory === 'surgical' && category.includes('surgical'))) {
+            if (selectedCategory === 'all' || selectedCategory === category) {
                 row.style.display = '';
                 row.style.animation = 'fadeIn 0.3s ease';
             } else {
@@ -261,29 +579,176 @@ document.addEventListener('DOMContentLoaded', function() {
             ripple.remove();
         }, 600);
         
-        // Show add product modal (you can implement this)
-        console.log('Add product clicked');
+        // Show add product modal
+        document.getElementById('addProductModal').style.display = 'flex';
     });
     
     // Edit/Delete button clicks
     const editBtns = document.querySelectorAll('.edit-btn');
     const deleteBtns = document.querySelectorAll('.delete-btn');
     
-    editBtns.forEach((btn, index) => {
-        btn.addEventListener('click', function() {
-            const productName = this.closest('.table-row').querySelector('.product-name').textContent;
-            console.log('Edit product:', productName);
-            // Implement edit functionality
+    editBtns.forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const productId = this.getAttribute('data-product-id');
+            const submitBtn = this;
+            const originalContent = submitBtn.innerHTML;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading-spinner"></span>';
+            
+            try {
+                const response = await fetch(`/admin/products/${productId}/edit`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch product details (Status: ${response.status})`);
+                }
+
+                const product = await response.json();
+                
+                if (product) {
+                    document.getElementById('edit_product_id').value = product.Product_ID;
+                    document.getElementById('edit_product_name').value = product.Product_Name;
+                    document.getElementById('edit_category').value = product.Category;
+                    document.getElementById('edit_description').value = product.Description;
+                    document.getElementById('edit_price_php').value = product.Unit_Price_PHP;
+                    document.getElementById('edit_stock_quantity').value = product.Stock_Quantity;
+                    document.getElementById('edit_status').value = product.Status || 'Active';
+                    
+                    document.getElementById('editProductModal').style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Error fetching product:', error);
+                alert('Failed to load product details.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalContent;
+            }
         });
     });
     
-    deleteBtns.forEach((btn, index) => {
+    deleteBtns.forEach(btn => {
         btn.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
             const productName = this.closest('.table-row').querySelector('.product-name').textContent;
-            console.log('Delete product:', productName);
-            // Implement delete functionality with confirmation
+            
+            document.getElementById('delete_product_name').textContent = productName;
+            document.getElementById('confirmDeleteBtn').setAttribute('data-product-id', productId);
+            
+            // Show delete modal
+            document.getElementById('deleteProductModal').style.display = 'flex';
         });
+    });
+    
+    // Add Product Form Submission
+    document.getElementById('addProductForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Adding...';
+        
+        try {
+            const response = await fetch('{{ route("admin.products.store") }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                },
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('Product added successfully!');
+                closeModal('addProductModal');
+                location.reload(); // Reload to show new product
+            } else {
+                alert('Error: ' + (data.message || 'Failed to add product'));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Add Product';
+        }
+    });
+    
+    // Edit Product Form Submission
+    document.getElementById('editProductForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const productId = document.getElementById('edit_product_id').value;
+        const formData = new FormData(this);
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Updating...';
+        
+        try {
+            const response = await fetch(`/admin/products/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'X-HTTP-Method-Override': 'PUT',
+                    'Accept': 'application/json',
+                },
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('Product updated successfully!');
+                closeModal('editProductModal');
+                location.reload();
+            } else {
+                alert('Error: ' + (data.message || 'Failed to update product'));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Save Changes';
+        }
+    });
+    
+    // Delete Product Confirmation
+    document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+        const productId = this.getAttribute('data-product-id');
+        this.disabled = true;
+        this.textContent = 'Deleting...';
+        
+        try {
+            const response = await fetch(`/admin/products/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('Product deleted successfully!');
+                closeModal('deleteProductModal');
+                location.reload();
+            } else {
+                alert('Error: ' + (data.message || 'Failed to delete product'));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        } finally {
+            this.disabled = false;
+            this.textContent = 'Delete Product';
+        }
     });
 });
 </script>
-@endpush
+

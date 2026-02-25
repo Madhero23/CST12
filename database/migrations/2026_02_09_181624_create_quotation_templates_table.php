@@ -11,12 +11,12 @@ return new class extends Migration
         Schema::create('quotation_templates', function (Blueprint $table) {
             $table->id('Template_ID');
             $table->string('Template_Name');
-            $table->enum('Template_Type', ['Government', 'Private Institution', 'Hospital', 'Standard']);
+            $table->enum('Template_Type', ['Government', 'PrivateInstitution', 'Hospital', 'Standard']);
             $table->string('File_Path')->nullable();
-            $table->date('Created_Date')->useCurrent();
             $table->foreignId('Created_By')->nullable()->constrained('users', 'User_ID');
             $table->boolean('Is_Active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -12,6 +12,7 @@
                 </a>
             </div>
 
+            @if(isset($product) && $product)
             <!-- Product Detail Section -->
             <section class="product-detail-section">
                 <div class="container">
@@ -19,10 +20,21 @@
                         <!-- Product Image -->
                         <div class="product-image-section">
                             <div class="product-image-container">
-                                <img src="{{ asset('container18.png') }}" alt="Digital Microscope Pro" class="product-main-image">
+                                @if($product->Images_Path)
+                                    <img src="{{ asset('storage/' . $product->Images_Path) }}" 
+                                         alt="{{ $product->Product_Name }}" 
+                                         class="product-main-image">
+                                @else
+                                    <img src="{{ asset('default-product.jpg') }}" 
+                                         alt="{{ $product->Product_Name }}" 
+                                         class="product-main-image">
+                                @endif
+                                
                                 <div class="product-certified-badge">
                                     <img src="{{ asset('icon4.svg') }}" alt="Certified" class="certified-icon">
-                                    <span class="certified-text">Certified</span>
+                                    <span class="certified-text">
+                                        {{ $product->FDA_Certification_Status ?? 'Not Certified' }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -30,42 +42,91 @@
                         <!-- Product Information -->
                         <div class="product-info-section">
                             <div class="product-category-badge">
-                                Diagnostic Equipment
+                                {{ $product->Category }}
                             </div>
                             
-                            <h1 class="product-title">Digital Microscope Pro</h1>
+                            <h1 class="product-title">{{ $product->Product_Name }}</h1>
                             
                             <div class="product-status-badge">
-                                <img src="{{ asset('icon1.svg') }}" alt="In Stock" class="status-icon">
-                                <span class="status-text">In Stock</span>
+                                <img src="{{ asset('icon1.svg') }}" alt="Stock Status" class="status-icon">
+                                <span class="status-text">
+                                    @if($product->Min_Stock_Level > 0)
+                                        In Stock (Min: {{ $product->Min_Stock_Level }})
+                                    @else
+                                        Out of Stock
+                                    @endif
+                                </span>
+                            </div>
+                            
+                            <div class="price-section">
+                                <div class="price-display">
+                                    <span class="price-label">Price:</span>
+                                    <span class="product-price">₱{{ number_format($product->Unit_Price_PHP, 2) }}</span>
+                                    <span class="price-usd">(${{ number_format($product->Unit_Price_USD, 2) }} USD)</span>
+                                </div>
+                                @if($product->Reorder_Quantity)
+                                <div class="reorder-info">
+                                    <span class="reorder-label">Reorder Quantity:</span>
+                                    <span class="reorder-value">{{ $product->Reorder_Quantity }} units</span>
+                                </div>
+                                @endif
                             </div>
                             
                             <p class="product-description">
-                                High-resolution digital microscope with advanced imaging
-                                capabilities for precise diagnostics and research applications.
+                                {{ $product->Description }}
                             </p>
+                            
+                            <!-- Product Specifications -->
+                            @php
+                                // FIXED: Remove json_decode() since Laravel already casts it to array
+                                $specifications = is_array($product->Specifications) 
+                                    ? $product->Specifications 
+                                    : (is_string($product->Specifications) 
+                                        ? json_decode($product->Specifications, true) 
+                                        : []);
+                            @endphp
+                            
+                            @if(!empty($specifications))
+                            <div class="product-specifications">
+                                <h3 class="specifications-title">Specifications</h3>
+                                <div class="specifications-grid">
+                                    @foreach($specifications as $key => $value)
+                                    <div class="spec-item">
+                                        <span class="spec-key">{{ ucwords(str_replace('_', ' ', $key)) }}:</span>
+                                        <span class="spec-value">{{ is_array($value) ? implode(', ', $value) : $value }}</span>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
                             
                             <!-- Product Features -->
                             <div class="product-features">
                                 <div class="feature-item">
                                     <div class="feature-dot"></div>
-                                    <p class="feature-text">Category: Diagnostic Equipment</p>
+                                    <p class="feature-text">Category: {{ $product->Category }}</p>
                                 </div>
+                                @if($product->FDA_Certification_Status)
                                 <div class="feature-item">
                                     <div class="feature-dot"></div>
-                                    <p class="feature-text">Professional-grade medical equipment with full warranty</p>
+                                    <p class="feature-text">
+                                        FDA Status: {{ $product->FDA_Certification_Status }}
+                                    </p>
                                 </div>
+                                @endif
+                                @if($product->Min_Stock_Level > 0)
                                 <div class="feature-item">
                                     <div class="feature-dot"></div>
-                                    <p class="feature-text">CE marked and FDA approved for clinical use</p>
+                                    <p class="feature-text">
+                                        Minimum Stock Level: {{ $product->Min_Stock_Level }} units
+                                    </p>
                                 </div>
+                                @endif
                                 <div class="feature-item">
                                     <div class="feature-dot"></div>
-                                    <p class="feature-text">High-resolution imaging up to 1000x magnification</p>
-                                </div>
-                                <div class="feature-item">
-                                    <div class="feature-dot"></div>
-                                    <p class="feature-text">Digital display with USB connectivity</p>
+                                    <p class="feature-text">
+                                        Added on: {{ \Carbon\Carbon::parse($product->Created_Date)->format('M d, Y') }}
+                                    </p>
                                 </div>
                             </div>
                             
@@ -73,12 +134,17 @@
                             <div class="inquiry-form">
                                 <div class="form-header">
                                     <img src="{{ asset('icon2.svg') }}" alt="Quote" class="form-icon">
-                                    <h3 class="form-title">Request a Quote</h3>
+                                    <h3 class="form-title">Request a Quote for "{{ $product->Product_Name }}"</h3>
                                 </div>
                                 
                                 <form class="quote-form" id="quoteForm">
+                                    @csrf
+                                    <input type="hidden" name="product_id" value="{{ $product->Product_ID }}">
+                                    <input type="hidden" name="product_name" value="{{ $product->Product_Name }}">
+                                    
                                     <div class="form-group">
                                         <input type="text" 
+                                               name="name"
                                                placeholder="Your Name" 
                                                class="form-input"
                                                required>
@@ -86,13 +152,29 @@
                                     
                                     <div class="form-group">
                                         <input type="email" 
+                                               name="email"
                                                placeholder="Your Email" 
                                                class="form-input"
                                                required>
                                     </div>
                                     
                                     <div class="form-group">
-                                        <textarea placeholder="Your Message" 
+                                        <input type="tel" 
+                                               name="phone"
+                                               placeholder="Phone Number" 
+                                               class="form-input">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <input type="text" 
+                                               name="company"
+                                               placeholder="Company/Organization" 
+                                               class="form-input">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <textarea name="message" 
+                                                  placeholder="Your Message (Include quantity and delivery requirements)" 
                                                   class="form-textarea"
                                                   rows="4"
                                                   required></textarea>
@@ -108,6 +190,21 @@
                     </div>
                 </div>
             </section>
+            @else
+            <!-- Product Not Found -->
+            <section class="product-not-found">
+                <div class="container">
+                    <div class="not-found-content">
+                        <img src="{{ asset('error-icon.svg') }}" alt="Not Found" class="not-found-icon">
+                        <h2>Product Not Found</h2>
+                        <p>The product you're looking for doesn't exist or has been removed.</p>
+                        <a href="{{ route('product') }}" class="back-to-products-btn">
+                            Back to Products
+                        </a>
+                    </div>
+                </div>
+            </section>
+            @endif
         </main>
 
         @include('components.footer')
@@ -120,65 +217,106 @@ document.addEventListener('DOMContentLoaded', function() {
     // Form submission with animation
     const quoteForm = document.getElementById('quoteForm');
     
-    quoteForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const submitBtn = this.querySelector('.submit-btn');
-        const originalText = submitBtn.querySelector('.submit-text').textContent;
-        
-        // Show loading state
-        submitBtn.querySelector('.submit-text').textContent = 'Sending...';
-        submitBtn.style.opacity = '0.7';
-        submitBtn.style.pointerEvents = 'none';
-        
-        // Simulate form submission (replace with actual AJAX call)
-        setTimeout(() => {
-            // Show success animation
-            submitBtn.innerHTML = `
-                <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-                    <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
-                    <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-                </svg>
-                <span class="submit-text">Sent Successfully!</span>
-            `;
-            submitBtn.classList.add('success');
+    if (quoteForm) {
+        quoteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            // Reset form
-            setTimeout(() => {
-                quoteForm.reset();
+            const submitBtn = this.querySelector('.submit-btn');
+            const originalText = submitBtn.querySelector('.submit-text').textContent;
+            
+            // Show loading state
+            submitBtn.querySelector('.submit-text').textContent = 'Sending...';
+            submitBtn.style.opacity = '0.7';
+            submitBtn.style.pointerEvents = 'none';
+            
+            // Collect form data
+            const formData = new FormData(this);
+            
+            // AJAX submission
+            fetch('{{ route("contact.inquiry") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success animation
+                    submitBtn.innerHTML = `
+                        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                        </svg>
+                        <span class="submit-text">Sent Successfully!</span>
+                    `;
+                    submitBtn.classList.add('success');
+                    
+                    // Reset form after success
+                    setTimeout(() => {
+                        quoteForm.reset();
+                        submitBtn.innerHTML = `
+                            <img src="{{ asset('icon3.svg') }}" alt="Submit" class="submit-icon">
+                            <span class="submit-text">${originalText}</span>
+                        `;
+                        submitBtn.classList.remove('success');
+                        submitBtn.style.opacity = '1';
+                        submitBtn.style.pointerEvents = 'auto';
+                        
+                        showNotification('Your inquiry has been submitted successfully!');
+                    }, 2000);
+                } else {
+                    throw new Error(data.message || 'Submission failed');
+                }
+            })
+            .catch(error => {
+                // Show error state
                 submitBtn.innerHTML = `
-                    <img src="{{ asset('icon3.svg') }}" alt="Submit" class="submit-icon">
-                    <span class="submit-text">${originalText}</span>
+                    <img src="{{ asset('error-icon.svg') }}" alt="Error" class="error-icon">
+                    <span class="submit-text">Error! Try Again</span>
                 `;
-                submitBtn.classList.remove('success');
-                submitBtn.style.opacity = '1';
-                submitBtn.style.pointerEvents = 'auto';
+                submitBtn.classList.add('error');
                 
-                // Show notification
-                showNotification('Your inquiry has been submitted successfully!');
-            }, 2000);
-        }, 1500);
-    });
+                setTimeout(() => {
+                    submitBtn.innerHTML = `
+                        <img src="{{ asset('icon3.svg') }}" alt="Submit" class="submit-icon">
+                        <span class="submit-text">${originalText}</span>
+                    `;
+                    submitBtn.classList.remove('error');
+                    submitBtn.style.opacity = '1';
+                    submitBtn.style.pointerEvents = 'auto';
+                    
+                    showNotification('Failed to submit inquiry. Please try again.', 'error');
+                }, 2000);
+            });
+        });
+    }
     
     // Back link animation
     const backLink = document.querySelector('.back-link');
-    backLink.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateX(-5px)';
-    });
-    
-    backLink.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateX(0)';
-    });
+    if (backLink) {
+        backLink.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(-5px)';
+        });
+        
+        backLink.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateX(0)';
+        });
+    }
     
     // Product image hover effect
     const productImage = document.querySelector('.product-main-image');
-    productImage.addEventListener('mouseenter', function() {
-        this.style.transform = 'scale(1.02)';
-    });
-    
-    productImage.addEventListener('mouseleave', function() {
-        this.style.transform = 'scale(1)';
-    });
+    if (productImage) {
+        productImage.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.02)';
+        });
+        
+        productImage.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    }
     
     // Feature items animation
     const featureItems = document.querySelectorAll('.feature-item');
@@ -188,15 +326,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Notification function
-    function showNotification(message) {
+    function showNotification(message, type = 'success') {
         const notification = document.createElement('div');
-        notification.className = 'notification';
+        notification.className = `notification notification-${type}`;
         notification.textContent = message;
         notification.style.cssText = `
             position: fixed;
             top: 100px;
             right: 20px;
-            background: var(--secondary-color);
+            background: ${type === 'success' ? 'var(--secondary-color)' : '#dc3545'};
             color: white;
             padding: 16px 24px;
             border-radius: 8px;
@@ -287,6 +425,113 @@ viewProductStyle.textContent = `
     
     .feature-item.animate-in {
         animation: slideInRight 0.5s ease forwards;
+    }
+    
+    .product-specifications {
+        margin: 2rem 0;
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 12px;
+    }
+    
+    .specifications-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+    
+    .specifications-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 0.75rem;
+    }
+    
+    .spec-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .spec-key {
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .spec-value {
+        color: #6c757d;
+    }
+    
+    .price-section {
+        margin: 1.5rem 0;
+    }
+    
+    .price-display {
+        display: flex;
+        align-items: baseline;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .product-price {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+    
+    .price-label {
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .price-usd {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .reorder-info {
+        display: flex;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .product-not-found {
+        padding: 4rem 0;
+        text-align: center;
+    }
+    
+    .not-found-content {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .not-found-icon {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 1.5rem;
+        opacity: 0.5;
+    }
+    
+    .back-to-products-btn {
+        display: inline-block;
+        margin-top: 1.5rem;
+        padding: 0.75rem 1.5rem;
+        background: var(--primary-color);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .back-to-products-btn:hover {
+        background: var(--secondary-color);
+        transform: translateY(-2px);
+    }
+    
+    .submit-btn.error {
+        background: #dc3545 !important;
     }
     
     @keyframes slideInRight {

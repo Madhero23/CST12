@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 @vite(['resources/css/admin.css'])
 <div class="admin-dashboard-container">
     @include('components.sidebar')
@@ -11,38 +12,38 @@
         <!-- Stats Cards -->
         <section class="stats-section">
             <div class="stats-grid">
-                <div class="stat-card stat-primary">
+                <div class="stat-card stat-teal">
                     <div class="stat-content">
                         <div class="stat-info">
                             <p class="stat-label">Total Products</p>
-                            <p class="stat-value">247</p>
+                            <p class="stat-value">{{ $stats['total_products'] ?? 0 }}</p>
                         </div>
                         <div class="stat-icon-container">
-                            <img class="stat-icon" src="{{ asset('icon0.svg') }}" alt="Products">
+                            <i class="stat-icon fas fa-box"></i>
                         </div>
                     </div>
                 </div>
                 
-                <div class="stat-card stat-warning">
+                <div class="stat-card stat-orange">
                     <div class="stat-content">
                         <div class="stat-info">
                             <p class="stat-label">Pending Inquiries</p>
-                            <p class="stat-value">12</p>
+                            <p class="stat-value">{{ $stats['pending_inquiries'] ?? 0 }}</p>
                         </div>
                         <div class="stat-icon-container">
-                            <img class="stat-icon" src="{{ asset('icon1.svg') }}" alt="Inquiries">
+                            <i class="stat-icon fas fa-comment"></i>
                         </div>
                     </div>
                 </div>
                 
-                <div class="stat-card stat-success">
+                <div class="stat-card stat-green">
                     <div class="stat-content">
                         <div class="stat-info">
                             <p class="stat-label">Completed Today</p>
-                            <p class="stat-value">8</p>
+                            <p class="stat-value">{{ $stats['completed_today'] ?? 0 }}</p>
                         </div>
                         <div class="stat-icon-container">
-                            <img class="stat-icon" src="{{ asset('icon2.svg') }}" alt="Completed">
+                            <i class="stat-icon fas fa-check-circle"></i>
                         </div>
                     </div>
                 </div>
@@ -50,85 +51,75 @@
         </section>
 
         <!-- Main Content Grid -->
-        <div class="content-grid">
-            <!-- Recent Activity -->
-            <section class="recent-activity-section">
-                <div class="section-card">
-                    <div class="section-header">
-                        <h2 class="section-title">Recent Activity</h2>
-                    </div>
-                    
-                    <div class="activity-list">
-                        <div class="activity-item">
-                            <div class="activity-indicator"></div>
-                            <div class="activity-content">
-                                <p class="activity-title">New product added</p>
-                                <p class="activity-detail">Digital Thermometer X200</p>
-                            </div>
-                            <span class="activity-time">15 mins ago</span>
+        <div class="dashboard-main-grid">
+            <div class="grid-left-col">
+                <!-- Recent Activity -->
+                <section class="recent-activity-section">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h2 class="section-title">Recent Activity</h2>
                         </div>
                         
-                        <div class="activity-item">
-                            <div class="activity-indicator"></div>
-                            <div class="activity-content">
-                                <p class="activity-title">Invoice paid</p>
-                                <p class="activity-detail">Invoice #INV-2024-0487</p>
-                            </div>
-                            <span class="activity-time">1 hour ago</span>
-                        </div>
-                        
-                        <div class="activity-item">
-                            <div class="activity-indicator"></div>
-                            <div class="activity-content">
-                                <p class="activity-title">Customer registered</p>
-                                <p class="activity-detail">St. Mary's Medical Center</p>
-                            </div>
-                            <span class="activity-time">3 hours ago</span>
+                        <div class="activity-list">
+                            @forelse($recentActivities as $activity)
+                                <div class="activity-item">
+                                    <div class="activity-indicator {{ ($activity['type'] ?? '') == 'Critical' ? 'indicator-red' : '' }}"></div>
+                                    <div class="activity-content">
+                                        <p class="activity-title">{{ $activity['title'] }}</p>
+                                        <p class="activity-detail">{{ $activity['detail'] }}</p>
+                                    </div>
+                                    <span class="activity-time">{{ $activity['time'] }}</span>
+                                </div>
+                            @empty
+                                <div class="empty-state">No recent activity found.</div>
+                            @endforelse
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
 
-            <!-- Quick Stats -->
-            <section class="quick-stats-section">
-                <div class="section-card">
-                    <div class="section-header">
-                        <h2 class="section-title">Quick Stats</h2>
-                    </div>
-                    
-                    <div class="stats-list">
-                        <div class="stat-item">
-                            <div class="stat-item-content">
-                                <div class="stat-item-icon">
-                                    <img src="{{ asset('icon3.svg') }}" alt="Low Stock">
-                                </div>
-                                <span class="stat-item-label">Low Stock Items</span>
-                            </div>
-                            <span class="stat-item-value danger">2</span>
+            <div class="grid-right-col">
+                <!-- Quick Stats -->
+                <section class="quick-stats-section">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h2 class="section-title">Quick Stats</h2>
                         </div>
                         
-                        <div class="stat-item">
-                            <div class="stat-item-content">
-                                <div class="stat-item-icon">
-                                    <img src="{{ asset('icon4.svg') }}" alt="Overdue">
+                        <div class="stats-list">
+                            <div class="stat-item">
+                                <div class="stat-item-left">
+                                    <div class="stat-item-icon bg-red-light">
+                                        <i class="fas fa-exclamation-triangle text-red"></i>
+                                    </div>
+                                    <span class="stat-item-label">Low Stock Items</span>
                                 </div>
-                                <span class="stat-item-label">Overdue Invoices</span>
+                                <span class="stat-item-value text-red">{{ $stats['low_stock_count'] ?? 0 }}</span>
                             </div>
-                            <span class="stat-item-value critical">1</span>
-                        </div>
-                        
-                        <div class="stat-item">
-                            <div class="stat-item-content">
-                                <div class="stat-item-icon">
-                                    <img src="{{ asset('icon5.svg') }}" alt="Quotes">
+                            
+                            <div class="stat-item">
+                                <div class="stat-item-left">
+                                    <div class="stat-item-icon bg-red-light">
+                                        <i class="fas fa-file-invoice-dollar text-red"></i>
+                                    </div>
+                                    <span class="stat-item-label">Overdue Invoices</span>
                                 </div>
-                                <span class="stat-item-label">Active Quotes</span>
+                                <span class="stat-item-value text-red">{{ $stats['overdue_invoices'] ?? 0 }}</span>
                             </div>
-                            <span class="stat-item-value info">7</span>
+                            
+                            <div class="stat-item">
+                                <div class="stat-item-left">
+                                    <div class="stat-item-icon bg-teal-light">
+                                        <i class="fas fa-chart-line text-teal"></i>
+                                    </div>
+                                    <span class="stat-item-label">Active Quotes</span>
+                                </div>
+                                <span class="stat-item-value text-teal">{{ $stats['active_quotations'] ?? 0 }}</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
         </div>
 
         <!-- Upcoming Follow-ups -->
@@ -140,36 +131,25 @@
                 </div>
                 
                 <div class="follow-ups-list">
-                    <div class="follow-up-item priority-high">
-                        <div class="follow-up-content">
-                            <h3 class="follow-up-title">City Hospital</h3>
-                            <p class="follow-up-detail">Follow up on equipment demo</p>
+                    @forelse($upcomingFollowUps as $followUp)
+                        <div class="follow-up-item border-left-{{ strtolower($followUp->Status ?? 'medium') }}">
+                            <div class="follow-up-content">
+                                <h3 class="follow-up-title">{{ $followUp->customer->Institution_Name ?? 'Unknown Institution' }}</h3>
+                                <p class="follow-up-detail">{{ $followUp->Subject }} - Due {{ \Carbon\Carbon::parse($followUp->Follow_Up_Date)->format('M d, Y') }}</p>
+                            </div>
+                            <button class="view-btn" onclick="window.location.href='/admin/customers/{{ $followUp->Customer_ID }}'">View</button>
                         </div>
-                        <button class="view-btn">View</button>
-                    </div>
-                    
-                    <div class="follow-up-item priority-medium">
-                        <div class="follow-up-content">
-                            <h3 class="follow-up-title">Med Clinic Plus</h3>
-                            <p class="follow-up-detail">Send revised quote</p>
-                        </div>
-                        <button class="view-btn">View</button>
-                    </div>
-                    
-                    <div class="follow-up-item priority-low">
-                        <div class="follow-up-content">
-                            <h3 class="follow-up-title">Valley Health Center</h3>
-                            <p class="follow-up-detail">Schedule installation</p>
-                        </div>
-                        <button class="view-btn">View</button>
-                    </div>
+                    @empty
+                        <div class="empty-state">No upcoming follow-ups.</div>
+                    @endforelse
                 </div>
             </div>
         </section>
     </main>
 </div>
 
-@push('scripts')
+
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Stats cards animation
@@ -441,4 +421,4 @@ adminStyles.textContent = `
 `;
 document.head.appendChild(adminStyles);
 </script>
-@endpush
+

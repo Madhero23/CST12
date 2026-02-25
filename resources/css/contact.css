@@ -157,10 +157,21 @@
     opacity: 0;
 }
 
-.form-group:nth-child(1) { animation-delay: 0.1s; }
-.form-group:nth-child(2) { animation-delay: 0.2s; }
-.form-group:nth-child(3) { animation-delay: 0.3s; }
-.form-group:nth-child(4) { animation-delay: 0.4s; }
+.form-group:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.form-group:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.form-group:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.form-group:nth-child(4) {
+    animation-delay: 0.4s;
+}
 
 .form-row {
     display: grid;
@@ -266,6 +277,79 @@
     align-items: center;
     justify-content: center;
 }
+
+.loader-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Error States */
+.form-input.error,
+.form-textarea.error {
+    border-color: var(--error-color);
+    background: rgba(193, 0, 7, 0.05);
+}
+
+.error-message {
+    display: block;
+    color: var(--error-color);
+    font-family: "Inter-Regular", sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+    margin-top: 6px;
+    animation: slideDown 0.3s ease;
+}
+
+/* Success State */
+.submit-btn.success {
+    background: var(--success-color);
+}
+
+.checkmark {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.checkmark-svg {
+    width: 24px;
+    height: 24px;
+}
+
+.checkmark-circle {
+    stroke: white;
+    stroke-width: 2;
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark-check {
+    stroke: white;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+}
+
+@keyframes stroke {
+    100% {
+        stroke-dashoffset: 0;
+    }
+}
+
 
 /* Contact Info Section */
 .contact-info-section {
@@ -492,6 +576,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -502,6 +587,7 @@
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -513,6 +599,7 @@
         opacity: 0;
         transform: translateY(-20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -524,6 +611,7 @@
         opacity: 0;
         transform: translateX(-30px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -535,6 +623,7 @@
         opacity: 0;
         transform: translateX(30px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -546,6 +635,7 @@
         opacity: 0;
         transform: translateX(-20px);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -557,6 +647,7 @@
         opacity: 0;
         transform: scale(0.9);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
@@ -569,7 +660,7 @@
         grid-template-columns: 1fr;
         gap: 30px;
     }
-    
+
     .contact-form-section,
     .contact-info-section {
         max-width: 800px;
@@ -581,23 +672,23 @@
     .contact-page {
         padding-top: 100px;
     }
-    
+
     .page-title {
         font-size: 36px;
         line-height: 43.2px;
     }
-    
+
     .form-row {
         grid-template-columns: 1fr;
         gap: 24px;
     }
-    
+
     .form-card,
     .info-card,
     .hours-card {
         padding: 25px;
     }
-    
+
     .submit-btn {
         padding: 14px 24px;
     }
@@ -608,24 +699,24 @@
         font-size: 28px;
         line-height: 33.6px;
     }
-    
+
     .page-subtitle {
         font-size: 14px;
         line-height: 22.4px;
     }
-    
+
     .form-card,
     .info-card,
     .hours-card {
         padding: 20px;
     }
-    
+
     .form-title,
     .info-title,
     .hours-title {
         font-size: 14px;
     }
-    
+
     .form-label,
     .form-input,
     .form-textarea,
@@ -635,18 +726,18 @@
     .time {
         font-size: 14px;
     }
-    
+
     .submit-btn {
         padding: 12px 20px;
         font-size: 14px;
     }
-    
+
     .contact-icon-container,
     .hours-icon-container {
         width: 36px;
         height: 36px;
     }
-    
+
     .contact-icon,
     .hours-icon {
         width: 16px;
@@ -659,6 +750,7 @@
     0% {
         background-position: -468px 0;
     }
+
     100% {
         background-position: 468px 0;
     }

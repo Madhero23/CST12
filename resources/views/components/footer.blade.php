@@ -24,9 +24,9 @@
                     @php
                         $footerRoutes = [
                             ['route' => 'home.index', 'text' => 'Home'],
-                            ['route' => 'products', 'text' => 'Products'],
+                            ['route' => 'products.index', 'text' => 'Products'],
                             ['route' => 'about', 'text' => 'About Us'],
-                            ['route' => 'contact', 'text' => 'Contact']
+                            ['route' => 'contact.index', 'text' => 'Contact']
                         ];
                     @endphp
                     

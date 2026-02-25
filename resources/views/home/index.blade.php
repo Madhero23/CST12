@@ -21,11 +21,11 @@
                     exceptional patient care.
                 </p>
                 <div class="hero-buttons">
-                    <a href="{{ route('product') }}" class="btn btn-primary">
+                    <a href="{{ route('products.index') }}" class="btn btn-primary">
                         <img class="btn-icon" src="{{ asset('icon8.svg') }}" alt="Browse Products" />
                         <span>Browse Products</span>
                     </a>
-                    <a href="{{ route('contact') }}" class="btn btn-secondary">
+                    <a href="{{ route('contact.index') }}" class="btn btn-secondary">
                         <img class="btn-icon" src="{{ asset('icon9.svg') }}" alt="Contact Sales" />
                         <span>Contact Sales</span>
                     </a>
