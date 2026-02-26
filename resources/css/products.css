@@ -118,12 +118,25 @@
     left: 18px;
     top: 50%;
     transform: translateY(-50%);
-    color: #94a3b8;
-    font-size: 16px;
+    color: #5bb1b7;
+    /* Teal color from user image */
+    font-size: 18px;
+    z-index: 5;
+    pointer-events: none;
 }
 
 .search-field {
-    width: 140%;
+    .search-field {
+        width: 100%;
+        padding: 14px 20px 14px 50px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 15px;
+        color: var(--text-dark);
+        transition: var(--transition);
+    }
+
     padding: 14px 20px 14px 50px;
     background: #f8fafc;
     border: 1px solid #e2e8f0;
