@@ -23,7 +23,11 @@ class ProductRepository
      */
     public function getAll(array $filters = []): Collection
     {
-        $query = Product::query();
+        $query = Product::query()
+            ->select('products.*')
+            ->leftJoin('inventories', 'products.Product_ID', '=', 'inventories.Product_ID')
+            ->selectRaw('SUM(inventories.Quantity_Available) as total_stock')
+            ->groupBy('products.Product_ID');
 
         // Apply category filter
         if (!empty($filters['category'])) {
@@ -43,16 +47,18 @@ class ProductRepository
         if (!empty($filters['status'])) {
             switch ($filters['status']) {
                 case 'in-stock':
-                    // Just a general active check for now, specific stock logic could be added
-                    $query->where('Status', 'Active');
+                    $query->havingRaw('SUM(inventories.Quantity_Available) > 0');
                     break;
                 case 'low-stock':
-                    $query->where('Status', 'Active')->where('Min_Stock_Level', '>', 0);
+                    $query->havingRaw('SUM(inventories.Quantity_Available) > 0 AND SUM(inventories.Quantity_Available) <= products.Min_Stock_Level');
+                    break;
+                case 'out-of-stock':
+                    $query->havingRaw('SUM(inventories.Quantity_Available) <= 0 OR SUM(inventories.Quantity_Available) IS NULL');
                     break;
             }
         }
 
-        return $query->orderBy('created_at', 'desc')->get();
+        return $query->orderBy('products.created_at', 'desc')->get();
     }
 
     /**

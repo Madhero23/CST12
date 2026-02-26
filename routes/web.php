@@ -23,13 +23,11 @@ use Illuminate\Support\Facades\Route;
 // Public Routes
 // ============================================================================
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('home.index');
 
 Route::get('/index', function () {
-    return view('home.index');
-})->name('home.index');
+    return redirect()->route('home.index');
+});
 
 Route::get('/about', function () {
     return view('about.about');

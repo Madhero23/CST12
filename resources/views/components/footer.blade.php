@@ -3,7 +3,7 @@
         <div class="footer-grid">
             <div class="company-info">
                 <div class="footer-logo">
-                    <img class="logo-image" src="{{ asset('image-roz-med-logo0.png') }}" alt="RozMed Logo" />
+                    <img class="logo-image" src="{{ asset('images/rozmed image.png') }}" alt="RozMed Logo" />
                     <div class="logo-text">
                         <div class="logo-main">
                             <span class="roz">Roz</span>

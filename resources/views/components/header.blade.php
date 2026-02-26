@@ -1,7 +1,7 @@
 <header class="header">
     <div class="header-container">
-        <div class="header-logo">
-            <img class="image-roz-med-logo" src="{{ asset('image-roz-med-logo1.png') }}" alt="RozMed Logo" />
+        <div class="logo-container">
+            <img class="logo-image" src="{{ asset('images/rozmed_logo.png') }}" alt="RozMed Logo" />
             <div class="logo-text">
                 <div class="logo-main">
                     <span class="roz">Roz</span>

@@ -1,4 +1,21 @@
-@vite('resources/css/index.css')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RozMed Enterprise - Professional Medical Equipment</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    @vite('resources/css/index.css')
+</head>
+<body>
 <div class="user-hero">
     <div class="app">
         @include('components.header')
@@ -7,7 +24,7 @@
         <div class="hero" id="hero-slideshow">
             <div class="hero-content">
                 <div class="trust-badge">
-                    <img class="icon" src="{{ asset('icon-7.svg') }}" alt="Trust Badge" />
+                    <i class="fas fa-star" style="color: var(--secondary-color); font-size: 0.9rem;"></i>
                     <div class="trust-text">Trusted by 500+ Healthcare Facilities</div>
                 </div>
                 <h1 class="main-heading">
@@ -21,20 +38,22 @@
                     exceptional patient care.
                 </p>
                 <div class="hero-buttons">
-                    <a href="{{ route('products.index') }}" class="btn btn-primary">
-                        <img class="btn-icon" src="{{ asset('icon8.svg') }}" alt="Browse Products" />
-                        <span>Browse Products</span>
-                    </a>
-                    <a href="{{ route('contact.index') }}" class="btn btn-secondary">
-                        <img class="btn-icon" src="{{ asset('icon9.svg') }}" alt="Contact Sales" />
-                        <span>Contact Sales</span>
-                    </a>
+                    <div class="cta-actions">
+                        <a href="{{ route('products.index') }}" class="btn btn-primary">
+                            <i class="fas fa-box btn-icon"></i>
+                            <span>Browse Catalog</span>
+                        </a>
+                        <a href="{{ route('contact.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-phone-alt btn-icon"></i>
+                            <span>Contact Sales</span>
+                        </a>
+                    </div>
                 </div>
             </div>
             
             <!-- Slide Indicator Dots -->
             <div class="slide-indicators">
-                @foreach(['hero.png', 'hero1.png', 'hero2.png', 'hero3.png'] as $index => $slide)
+                @foreach($heroImages ?? ['Hero.png', 'hero2.png', 'hero3.png', 'hero4.png'] as $index => $slide)
                     <button class="slide-indicator {{ $index === 0 ? 'active' : '' }}" 
                             data-slide="{{ $index }}" 
                             aria-label="Go to slide {{ $index + 1 }}">
@@ -50,25 +69,31 @@
                 <p class="section-description">Discover our most popular healthcare solutions</p>
             </div>
             <div class="equipment-grid">
-                @foreach([
-                    ['icon' => 'icon10.svg', 'title' => 'Medical Ultrasound Device', 'desc' => 'High-resolution imaging system for radiology, cardiology, and obstetrics departments.'],
-                    ['icon' => 'icon12.svg', 'title' => 'Patient Monitor', 'desc' => 'Continuous multi-parameter monitoring with intuitive alarms for critical care units.'],
-                    ['icon' => 'icon14.svg', 'title' => 'Surgical Instruments Set', 'desc' => 'Precision-crafted instruments engineered for durability and optimal surgical control.']
-                ] as $index => $equipment)
+                @forelse($featuredProducts as $index => $product)
                 <div class="equipment-card" style="--i: {{ $index }}">
                     <div class="card-image">
-                        <img class="equipment-icon" src="{{ asset($equipment['icon']) }}" alt="{{ $equipment['title'] }}" />
+                        <div class="equipment-icon-wrapper">
+                            @if($index == 0) <i class="fas fa-wave-square"></i>
+                            @elseif($index == 1) <i class="fas fa-heart"></i>
+                            @else <i class="fas fa-scissors"></i>
+                            @endif
+                        </div>
+                        @if($product->Images_Path)
+                            <img class="equipment-large-img" src="{{ asset($product->Images_Path) }}" alt="{{ $product->Product_Name }}" />
+                        @endif
                     </div>
                     <div class="card-content">
-                        <h3 class="card-title">{{ $equipment['title'] }}</h3>
-                        <p class="card-description">{{ $equipment['desc'] }}</p>
-                        <a href="{{ route('product', ['id' => $index + 1]) }}" class="card-link">
-                            <span>View More</span>
-                            <img class="link-icon" src="{{ asset('icon' . ($index + 11) . '.svg') }}" alt="View More" />
+                        <h3 class="card-title">{{ $product->Product_Name }}</h3>
+                        <p class="card-description">{{ Str::limit($product->Description, 100) }}</p>
+                        <a href="{{ route('products.show', ['id' => $product->Product_ID]) }}" class="card-link">
+                            <span>View Details</span>
+                            <i class="fas fa-arrow-right"></i>
                         </a>
                     </div>
                 </div>
-                @endforeach
+                @empty
+                <p class="empty-state">No featured equipment available at the moment.</p>
+                @endforelse
             </div>
         </section>
 
@@ -89,7 +114,10 @@
                 ] as $index => $feature)
                 <div class="feature-card" style="--i: {{ $index }}">
                     <div class="feature-icon-wrapper">
-                        <img class="feature-icon" src="{{ asset($feature['icon']) }}" alt="{{ $feature['title'] }}" />
+                        @if($index == 0) <i class="fas fa-shield-alt"></i>
+                        @elseif($index == 1) <i class="fas fa-user-md"></i>
+                        @else <i class="fas fa-shipping-fast"></i>
+                        @endif
                     </div>
                     <h3 class="feature-title">{{ $feature['title'] }}</h3>
                     <p class="feature-description">{{ $feature['desc'] }}</p>
@@ -98,62 +126,90 @@
             </div>
         </section>
 
-        <!-- Stats Section -->
         <section class="stats">
-            @foreach([
-                ['icon' => 'icon3.svg', 'value' => '500+', 'label' => 'Healthcare Facilities'],
-                ['icon' => 'icon4.svg', 'value' => '10K+', 'label' => 'Products Delivered'],
-                ['icon' => 'icon5.svg', 'value' => '14+', 'label' => 'Years of Experience'],
-                ['icon' => 'icon6.svg', 'value' => '98%', 'label' => 'Customer Satisfaction']
-            ] as $index => $stat)
-            <div class="stat-card" style="--i: {{ $index }}">
+            <div class="stat-card" style="--i: 0">
                 <div class="stat-icon-wrapper">
-                    <img class="stat-icon" src="{{ asset($stat['icon']) }}" alt="{{ $stat['label'] }}" />
+                    <i class="fas fa-hospital"></i>
                 </div>
-                <div class="stat-value">{{ $stat['value'] }}</div>
-                <div class="stat-label">{{ $stat['label'] }}</div>
+                <div class="stat-value">{{ $stats['facilities'] < 10 ? '500+' : $stats['facilities'] . '+' }}</div>
+                <div class="stat-label">Healthcare Facilities</div>
             </div>
-            @endforeach
+            <div class="stat-card" style="--i: 1">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <div class="stat-value">{{ $stats['products_delivered'] < 10 ? '10K+' : number_format($stats['products_delivered']) . '+' }}</div>
+                <div class="stat-label">Products Delivered</div>
+            </div>
+            <div class="stat-card" style="--i: 2">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-medal"></i>
+                </div>
+                <div class="stat-value">{{ $stats['experience_years'] }}+</div>
+                <div class="stat-label">Years of Experience</div>
+            </div>
+            <div class="stat-card" style="--i: 3">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-thumbs-up"></i>
+                </div>
+                <div class="stat-value">{{ $stats['satisfaction_rate'] }}</div>
+                <div class="stat-label">Customer Satisfaction</div>
+            </div>
         </section>
 
         @include('components.footer')
     </div>
 </div>
 
-@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Array of hero background images
+    // Array of hero background images from public/images/
     const heroImages = [
-        "{{ asset('hero0.png') }}",
-        "{{ asset('hero1.png') }}", // Add these images to your public folder
-        "{{ asset('hero2.png') }}", // Add these images to your public folder
-        "{{ asset('hero3.png') }}"  // Add these images to your public folder
+        "{{ asset('images/Hero.png') }}",
+        "{{ asset('images/hero2.png') }}",
+        "{{ asset('images/hero3.png') }}",
+        "{{ asset('images/hero4.png') }}"
     ];
     
-    // Slide duration in milliseconds (30 seconds)
-    const SLIDE_DURATION = 30000;
+    // Slide duration in milliseconds (20 seconds)
+    const SLIDE_DURATION = 20000;
     
     const heroElement = document.getElementById('hero-slideshow');
     const indicators = document.querySelectorAll('.slide-indicator');
     let currentSlide = 0;
     let slideInterval;
     
+    // Preload images to prevent blank flickering
+    heroImages.forEach(src => {
+        const img = new Image();
+        img.src = src;
+    });
+    
     // Function to change slide
     function changeSlide(slideIndex) {
+        if (!heroElement || indicators.length === 0) return;
+        
         // Remove active class from all indicators
         indicators.forEach(indicator => {
             indicator.classList.remove('active');
         });
         
         // Set current slide
-        currentSlide = slideIndex;
+        currentSlide = slideIndex % heroImages.length;
         
         // Add active class to current indicator
-        indicators[currentSlide].classList.add('active');
+        if (indicators[currentSlide]) {
+            indicators[currentSlide].classList.add('active');
+        }
         
         // Change background with fade effect
-        heroElement.style.opacity = '0.7';
+        // We use a CSS class or transition for smoothness
+        heroElement.style.transition = 'background-image 0.8s ease-in-out, opacity 0.5s ease-in-out';
+        
+        // For the very first slide, don't flicker opacity as much
+        if (heroElement.style.backgroundImage) {
+            heroElement.style.opacity = '0.9';
+        }
         
         setTimeout(() => {
             heroElement.style.backgroundImage = `url('${heroImages[currentSlide]}')`;
@@ -161,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
             heroElement.style.backgroundSize = 'cover';
             heroElement.style.backgroundRepeat = 'no-repeat';
             heroElement.style.opacity = '1';
-        }, 300); // Transition duration
+        }, 100);
     }
     
     // Function to go to next slide
@@ -172,53 +228,41 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to start slideshow
     function startSlideshow() {
+        stopSlideshow(); // Clear any existing
         slideInterval = setInterval(nextSlide, SLIDE_DURATION);
     }
     
-    // Function to stop slideshow (when user interacts)
+    // Function to stop slideshow
     function stopSlideshow() {
-        clearInterval(slideInterval);
+        if (slideInterval) {
+            clearInterval(slideInterval);
+        }
     }
     
-    // Function to resume slideshow after pause
-    function resumeSlideshow() {
-        stopSlideshow();
-        setTimeout(startSlideshow, 5000); // Resume after 5 seconds
+    // Initialize first slide immediately
+    if (heroElement) {
+        // Set initial background before the first transition
+        heroElement.style.backgroundImage = `url('${heroImages[0]}')`;
+        heroElement.style.backgroundPosition = 'center';
+        heroElement.style.backgroundSize = 'cover';
+        changeSlide(0);
+        startSlideshow();
     }
-    
-    // Initialize first slide
-    changeSlide(0);
-    
-    // Start slideshow
-    startSlideshow();
     
     // Add click event to indicators
     indicators.forEach((indicator, index) => {
         indicator.addEventListener('click', () => {
             stopSlideshow();
             changeSlide(index);
-            resumeSlideshow();
-        });
-        
-        // Add keyboard support
-        indicator.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                stopSlideshow();
-                changeSlide(index);
-                resumeSlideshow();
-            }
+            startSlideshow();
         });
     });
     
-    // Pause slideshow when user hovers over hero section
+    // Pause on hover
     heroElement.addEventListener('mouseenter', stopSlideshow);
-    heroElement.addEventListener('mouseleave', () => {
-        // Wait a bit before resuming to prevent immediate change
-        setTimeout(startSlideshow, 1000);
-    });
+    heroElement.addEventListener('mouseleave', startSlideshow);
     
-    // Pause slideshow when window loses focus
+    // Visibility change
     document.addEventListener('visibilitychange', function() {
         if (document.hidden) {
             stopSlideshow();
@@ -226,20 +270,7 @@ document.addEventListener('DOMContentLoaded', function() {
             startSlideshow();
         }
     });
-    
-    // Add keyboard navigation (left/right arrows)
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowLeft') {
-            stopSlideshow();
-            const prevIndex = (currentSlide - 1 + heroImages.length) % heroImages.length;
-            changeSlide(prevIndex);
-            resumeSlideshow();
-        } else if (e.key === 'ArrowRight') {
-            stopSlideshow();
-            nextSlide();
-            resumeSlideshow();
-        }
-    });
 });
 </script>
-@endpush
+</body>
+</html>
