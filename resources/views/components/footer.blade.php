@@ -56,7 +56,7 @@
         </div>
 
         <div class="footer-bottom">
-            <p class="copyright">© 2025 RozMed. All rights reserved.</p>
+            <p class="copyright">© 2026 RozMed. All rights reserved.</p>
         </div>
     </div>
 </footer>
