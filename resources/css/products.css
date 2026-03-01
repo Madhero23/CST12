@@ -118,25 +118,14 @@
     left: 18px;
     top: 50%;
     transform: translateY(-50%);
-    color: #5bb1b7;
-    /* Teal color from user image */
+    color: #2f7a85;
+    /* Teal from image */
     font-size: 18px;
-    z-index: 5;
-    pointer-events: none;
+    z-index: 10;
 }
 
 .search-field {
-    .search-field {
-        width: 100%;
-        padding: 14px 20px 14px 50px;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        font-size: 15px;
-        color: var(--text-dark);
-        transition: var(--transition);
-    }
-
+    width: 148%;
     padding: 14px 20px 14px 50px;
     background: #f8fafc;
     border: 1px solid #e2e8f0;
@@ -188,7 +177,8 @@
     top: 50%;
     transform: translateY(-50%);
     color: #0f172a;
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: 900;
     pointer-events: none;
 }
 
@@ -312,6 +302,7 @@
 .product-price {
     font-size: 18px;
     color: #0f172a;
+    font-weight: 600;
 }
 
 .stock-pill {

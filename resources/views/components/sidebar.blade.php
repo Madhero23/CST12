@@ -41,7 +41,7 @@
 <div class="admin-sidebar">
     <div class="sidebar-header">
         <div class="logo-container">
-            <img class="logo-image" src="{{ asset('images/rozmed_logo.png') }}" alt="RozMed Logo">
+            <img class="logo-image" src="{{ asset('images/rozmed image.png') }}" alt="RozMed Logo">
             <div class="logo-text">
                 <div class="logo-main">
                     <span class="roz">Roz</span>

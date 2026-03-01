@@ -1,4 +1,21 @@
-@vite(['resources/css/viewproduct.css'])
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RozMed - Product Details</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    @vite(['resources/css/viewproduct.css'])
+</head>
+<body>
 <div class="user-hero">
     <div class="app">
         @include('components.header')
@@ -6,8 +23,8 @@
         <main class="product-detail-page">
             <!-- Back Navigation -->
             <div class="container">
-                <a href="{{ route('product') }}" class="back-link">
-                    <img class="icon" src="{{ asset('icon0.svg') }}" alt="Back">
+                <a href="{{ route('products.index') }}" class="back-link">
+                    <i class="fas fa-arrow-left back-icon"></i>
                     <span class="back-text">Back to Products</span>
                 </a>
             </div>
@@ -31,30 +48,42 @@
                                 @endif
                                 
                                 <div class="product-certified-badge">
-                                    <img src="{{ asset('icon4.svg') }}" alt="Certified" class="certified-icon">
-                                    <span class="certified-text">
-                                        {{ $product->FDA_Certification_Status ?? 'Not Certified' }}
-                                    </span>
+                                    <i class="far fa-check-circle certified-icon"></i>
+                                    <span class="certified-text">Certified</span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Product Information -->
                         <div class="product-info-section">
-                            <div class="product-category-badge">
-                                {{ $product->Category }}
+                            <div class="product-category-wrap">
+                                <span class="product-category-badge">
+                                    @php
+                                        $categoryLabels = [
+                                            'DiagnosticEquipment' => 'Diagnostic Equipment',
+                                            'MedicalInstruments' => 'Medical Instruments',
+                                            'MonitoringDevices' => 'Monitoring Devices',
+                                            'EmergencyEquipment' => 'Emergency Equipment',
+                                            'InfusionSystems' => 'Infusion Systems',
+                                            'LaboratoryEquipment' => 'Laboratory Equipment'
+                                        ];
+                                    @endphp
+                                    {{ $categoryLabels[$product->Category] ?? $product->Category }}
+                                </span>
                             </div>
                             
                             <h1 class="product-title">{{ $product->Product_Name }}</h1>
                             
-                            <div class="product-status-badge">
-                                <img src="{{ asset('icon1.svg') }}" alt="Stock Status" class="status-icon">
-                                <span class="status-text">
-                                    @if($product->Min_Stock_Level > 0)
-                                        In Stock (Min: {{ $product->Min_Stock_Level }})
-                                    @else
-                                        Out of Stock
-                                    @endif
+                            <div class="product-status-wrap">
+                                <span class="product-status-badge @if($product->Min_Stock_Level > 0) in-stock @else out-of-stock @endif">
+                                    <i class="fas @if($product->Min_Stock_Level > 0) fa-check-circle @else fa-times-circle @endif status-icon"></i>
+                                    <span class="status-text">
+                                        @if($product->Min_Stock_Level > 0)
+                                            In Stock
+                                        @else
+                                            Out of Stock
+                                        @endif
+                                    </span>
                                 </span>
                             </div>
                             
@@ -102,87 +131,47 @@
                             
                             <!-- Product Features -->
                             <div class="product-features">
-                                <div class="feature-item">
-                                    <div class="feature-dot"></div>
-                                    <p class="feature-text">Category: {{ $product->Category }}</p>
-                                </div>
-                                @if($product->FDA_Certification_Status)
-                                <div class="feature-item">
-                                    <div class="feature-dot"></div>
-                                    <p class="feature-text">
-                                        FDA Status: {{ $product->FDA_Certification_Status }}
-                                    </p>
-                                </div>
-                                @endif
-                                @if($product->Min_Stock_Level > 0)
-                                <div class="feature-item">
-                                    <div class="feature-dot"></div>
-                                    <p class="feature-text">
-                                        Minimum Stock Level: {{ $product->Min_Stock_Level }} units
-                                    </p>
-                                </div>
-                                @endif
-                                <div class="feature-item">
-                                    <div class="feature-dot"></div>
-                                    <p class="feature-text">
-                                        Added on: {{ \Carbon\Carbon::parse($product->Created_Date)->format('M d, Y') }}
-                                    </p>
-                                </div>
+                                <ul class="features-list">
+                                    <li class="feature-item">Category: {{ $categoryLabels[$product->Category] ?? $product->Category }}</li>
+                                    <li class="feature-item">Professional-grade medical equipment with full warranty</li>
+                                    @if($product->FDA_Certification_Status == 'Certified')
+                                        <li class="feature-item">CE marked and FDA approved for clinical use</li>
+                                    @endif
+                                    @if($product->Description)
+                                        <li class="feature-item">{{ \Illuminate\Support\Str::limit($product->Description, 100) }}</li>
+                                    @endif
+                                    <li class="feature-item">Added on: {{ \Carbon\Carbon::parse($product->created_at)->format('M d, Y') }}</li>
+                                </ul>
                             </div>
                             
                             <!-- Inquiry Form -->
-                            <div class="inquiry-form">
-                                <div class="form-header">
-                                    <img src="{{ asset('icon2.svg') }}" alt="Quote" class="form-icon">
-                                    <h3 class="form-title">Request a Quote for "{{ $product->Product_Name }}"</h3>
+                            <div class="inquiry-card">
+                                <div class="inquiry-header">
+                                    <i class="fas fa-paper-plane inquiry-icon"></i>
+                                    <h3 class="inquiry-title">Request a Quote</h3>
                                 </div>
                                 
                                 <form class="quote-form" id="quoteForm">
                                     @csrf
                                     <input type="hidden" name="product_id" value="{{ $product->Product_ID }}">
                                     <input type="hidden" name="product_name" value="{{ $product->Product_Name }}">
+                                    <input type="hidden" name="subject" value="Inquiry for {{ $product->Product_Name }}">
                                     
                                     <div class="form-group">
-                                        <input type="text" 
-                                               name="name"
-                                               placeholder="Your Name" 
-                                               class="form-input"
-                                               required>
+                                        <input type="text" name="name" placeholder="Your Name" class="form-input" required>
                                     </div>
                                     
                                     <div class="form-group">
-                                        <input type="email" 
-                                               name="email"
-                                               placeholder="Your Email" 
-                                               class="form-input"
-                                               required>
+                                        <input type="email" name="email" placeholder="Your Email" class="form-input" required>
                                     </div>
                                     
                                     <div class="form-group">
-                                        <input type="tel" 
-                                               name="phone"
-                                               placeholder="Phone Number" 
-                                               class="form-input">
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <input type="text" 
-                                               name="company"
-                                               placeholder="Company/Organization" 
-                                               class="form-input">
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <textarea name="message" 
-                                                  placeholder="Your Message (Include quantity and delivery requirements)" 
-                                                  class="form-textarea"
-                                                  rows="4"
-                                                  required></textarea>
+                                        <textarea name="message" placeholder="Your Message" class="form-textarea" rows="4" required></textarea>
                                     </div>
                                     
                                     <button type="submit" class="submit-btn">
-                                        <img src="{{ asset('icon3.svg') }}" alt="Submit" class="submit-icon">
-                                        <span class="submit-text">Submit Inquiry</span>
+                                        <i class="fas fa-paper-plane"></i>
+                                        <span>Submit Inquiry</span>
                                     </button>
                                 </form>
                             </div>
@@ -543,4 +532,5 @@ viewProductStyle.textContent = `
 `;
 document.head.appendChild(viewProductStyle);
 </script>
-@endpush
+</body>
+</html>
