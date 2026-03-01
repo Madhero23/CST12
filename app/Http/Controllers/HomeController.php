@@ -33,4 +33,24 @@ class HomeController extends Controller
 
         return view('home.index', compact('featuredProducts', 'stats'));
     }
+
+    /**
+     * Display the about us page
+     *
+     * @return View
+     */
+    public function about(): View
+    {
+        return view('about.about');
+    }
+
+    /**
+     * Display the contact us page
+     *
+     * @return View
+     */
+    public function contact(): View
+    {
+        return view('contact.contact');
+    }
 }

@@ -1,200 +1,219 @@
-@vite(['resources/css/contact.css'])
-<div class="user-hero">
-    <div class="app">
-        @include('components.header')
-        
-        <main class="contact-page">
-            <!-- Hero Section -->
-            <section class="contact-hero">
-                <div class="container">
-                    <h1 class="page-title">Contact Us</h1>
-                    <p class="page-subtitle">
-                        Get in touch with our team for inquiries, support, or partnership opportunities
-                    </p>
-                </div>
-            </section>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | RozMed Medical Equipment & Supplies</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    @vite(['resources/css/contact.css'])
+</head>
+<body>
+    <div class="user-hero">
+        <div class="app">
+            @include('components.header')
+            
+            <main class="contact-page">
+                <!-- Hero Section -->
+                <section class="contact-hero">
+                    <div class="container">
+                        <h1 class="page-title">Contact Us</h1>
+                        <p class="page-subtitle">
+                            Get in touch with our team for inquiries, support, or partnership opportunities
+                        </p>
+                    </div>
+                </section>
 
-            <!-- Contact Content -->
-            <section class="contact-content">
-                <div class="container">
-                    <div class="contact-grid">
-                        <!-- Contact Form -->
-                        <div class="contact-form-section">
-                            <div class="form-card">
-                                <h2 class="form-title">Send us a Message</h2>
-                                
-                                <form class="contact-form" id="contactForm" method="POST" action="{{ route('contact.inquiry') }}">
-                                    @csrf
+                <!-- Contact Content -->
+                <section class="contact-content">
+                    <div class="container">
+                        <div class="contact-grid">
+                            <!-- Contact Form -->
+                            <div class="contact-form-section">
+                                <div class="form-card">
+                                    <h2 class="form-title">Send us a Message</h2>
                                     
-                                    <div class="form-group">
-                                        <label for="name" class="form-label">Full Name</label>
-                                        <input type="text" 
-                                               id="name" 
-                                               name="name"
-                                               placeholder="John Doe"
-                                               class="form-input"
-                                               value="{{ old('name') }}"
-                                               required>
-                                        @error('name')
-                                            <span class="error-message">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                    
-                                    <div class="form-row">
+                                    <form class="contact-form" id="contactForm" method="POST" action="{{ route('contact.inquiry') }}">
+                                        @csrf
+                                        
                                         <div class="form-group">
-                                            <label for="email" class="form-label">Email Address</label>
-                                            <input type="email" 
-                                                   id="email" 
-                                                   name="email"
-                                                   placeholder="john@example.com"
+                                            <label for="name" class="form-label">Full Name</label>
+                                            <input type="text" 
+                                                   id="name" 
+                                                   name="name"
+                                                   placeholder="John Doe"
                                                    class="form-input"
-                                                   value="{{ old('email') }}"
+                                                   value="{{ old('name') }}"
                                                    required>
-                                            @error('email')
+                                            @error('name')
+                                                <span class="error-message">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                        
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label for="email" class="form-label">Email Address</label>
+                                                <input type="email" 
+                                                       id="email" 
+                                                       name="email"
+                                                       placeholder="john@example.com"
+                                                       class="form-input"
+                                                       value="{{ old('email') }}"
+                                                       required>
+                                                @error('email')
+                                                    <span class="error-message">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                            
+                                            <div class="form-group">
+                                                <label for="phone" class="form-label">Phone Number</label>
+                                                <input type="tel" 
+                                                       id="phone" 
+                                                       name="phone"
+                                                       placeholder="+1 (555) 000-0000"
+                                                       class="form-input"
+                                                       value="{{ old('phone') }}">
+                                                @error('phone')
+                                                    <span class="error-message">{{ $message }}</span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="company" class="form-label">Company (Optional)</label>
+                                            <input type="text" 
+                                                   id="company" 
+                                                   name="company"
+                                                   placeholder="Your Company Name"
+                                                   class="form-input"
+                                                   value="{{ old('company') }}">
+                                            @error('company')
                                                 <span class="error-message">{{ $message }}</span>
                                             @enderror
                                         </div>
                                         
                                         <div class="form-group">
-                                            <label for="phone" class="form-label">Phone Number</label>
-                                            <input type="tel" 
-                                                   id="phone" 
-                                                   name="phone"
-                                                   placeholder="+1 (555) 000-0000"
+                                            <label for="subject" class="form-label">Subject</label>
+                                            <input type="text" 
+                                                   id="subject" 
+                                                   name="subject"
+                                                   placeholder="Equipment inquiry, support request, etc."
                                                    class="form-input"
-                                                   value="{{ old('phone') }}">
-                                            @error('phone')
+                                                   value="{{ old('subject') }}"
+                                                   required>
+                                            @error('subject')
                                                 <span class="error-message">{{ $message }}</span>
                                             @enderror
                                         </div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="company" class="form-label">Company (Optional)</label>
-                                        <input type="text" 
-                                               id="company" 
-                                               name="company"
-                                               placeholder="Your Company Name"
-                                               class="form-input"
-                                               value="{{ old('company') }}">
-                                        @error('company')
-                                            <span class="error-message">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="subject" class="form-label">Subject</label>
-                                        <input type="text" 
-                                               id="subject" 
-                                               name="subject"
-                                               placeholder="Equipment inquiry, support request, etc."
-                                               class="form-input"
-                                               value="{{ old('subject') }}"
-                                               required>
-                                        @error('subject')
-                                            <span class="error-message">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="message" class="form-label">Message</label>
-                                        <textarea id="message" 
-                                                  name="message"
-                                                  placeholder="Tell us how we can help you..."
-                                                  class="form-textarea"
-                                                  rows="5"
-                                                  required>{{ old('message') }}</textarea>
-                                        @error('message')
-                                            <span class="error-message">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                    
-                                    <button type="submit" class="submit-btn">
-                                        <span class="btn-text">Send Message</span>
-                                        <div class="btn-loader">
-                                            <div class="loader-spinner"></div>
+                                        
+                                        <div class="form-group">
+                                            <label for="message" class="form-label">Message</label>
+                                            <textarea id="message" 
+                                                      name="message"
+                                                      placeholder="Tell us how we can help you..."
+                                                      class="form-textarea"
+                                                      rows="5"
+                                                      required>{{ old('message') }}</textarea>
+                                            @error('message')
+                                                <span class="error-message">{{ $message }}</span>
+                                            @enderror
                                         </div>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-
-                        <!-- Contact Information -->
-                        <div class="contact-info-section">
-                            <!-- Contact Info Card -->
-                            <div class="info-card">
-                                <h3 class="info-title">Contact Information</h3>
-                                
-                                <div class="contact-info-list">
-                                    <div class="contact-info-item">
-                                        <div class="contact-icon-container">
-                                            <img src="{{ asset('icon0.svg') }}" alt="Email" class="contact-icon">
-                                        </div>
-                                        <div class="contact-details">
-                                            <p class="contact-label">Email</p>
-                                            <a href="mailto:support@rozmed.com" class="contact-value">support@rozmed.com</a>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="contact-info-item">
-                                        <div class="contact-icon-container">
-                                            <img src="{{ asset('icon1.svg') }}" alt="Phone" class="contact-icon">
-                                        </div>
-                                        <div class="contact-details">
-                                            <p class="contact-label">Phone</p>
-                                            <a href="tel:+15551234567" class="contact-value">+1 (555) 123-4567</a>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="contact-info-item">
-                                        <div class="contact-icon-container">
-                                            <img src="{{ asset('icon2.svg') }}" alt="Address" class="contact-icon">
-                                        </div>
-                                        <div class="contact-details">
-                                            <p class="contact-label">Address</p>
-                                            <p class="contact-value address">
-                                                2450 Medical Center Drive, Suite 300, San Francisco, CA 94158
-                                            </p>
-                                        </div>
-                                    </div>
+                                        
+                                        <button type="submit" class="submit-btn">
+                                            <span class="btn-text">Send Message</span>
+                                            <div class="btn-loader">
+                                                <div class="loader-spinner"></div>
+                                            </div>
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
 
-                            <!-- Business Hours Card -->
-                            <div class="hours-card">
-                                <div class="hours-header">
-                                    <div class="hours-icon-container">
-                                        <img src="{{ asset('icon3.svg') }}" alt="Business Hours" class="hours-icon">
+                            <!-- Contact Information -->
+                            <div class="contact-info-section">
+                                <!-- Contact Info Card -->
+                                <div class="info-card">
+                                    <h3 class="info-title">Contact Information</h3>
+                                    
+                                    <div class="contact-info-list">
+                                        <div class="contact-info-item">
+                                            <div class="contact-icon-container">
+                                                <i class="fas fa-envelope contact-icon"></i>
+                                            </div>
+                                            <div class="contact-details">
+                                                <p class="contact-label">Email</p>
+                                                <a href="mailto:support@rozmed.com" class="contact-value">support@rozmed.com</a>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="contact-info-item">
+                                            <div class="contact-icon-container">
+                                                <i class="fas fa-phone contact-icon"></i>
+                                            </div>
+                                            <div class="contact-details">
+                                                <p class="contact-label">Phone</p>
+                                                <a href="tel:+15551234567" class="contact-value">+1 (555) 123-4567</a>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="contact-info-item">
+                                            <div class="contact-icon-container">
+                                                <i class="fas fa-location-dot contact-icon"></i>
+                                            </div>
+                                            <div class="contact-details">
+                                                <p class="contact-label">Address</p>
+                                                <p class="contact-value address">
+                                                    2450 Medical Center Drive, Suite 300, San Francisco, CA 94158
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <h3 class="hours-title">Business Hours</h3>
                                 </div>
-                                
-                                <div class="hours-list">
-                                    <div class="hours-item">
-                                        <span class="day">Monday - Friday</span>
-                                        <span class="time">8:00 AM - 6:00 PM</span>
+
+                                <!-- Business Hours Card -->
+                                <div class="hours-card">
+                                    <div class="hours-header">
+                                        <div class="hours-icon-container">
+                                            <i class="fas fa-clock hours-icon"></i>
+                                        </div>
+                                        <h3 class="hours-title">Business Hours</h3>
                                     </div>
                                     
-                                    <div class="hours-item">
-                                        <span class="day">Saturday</span>
-                                        <span class="time">9:00 AM - 2:00 PM</span>
-                                    </div>
-                                    
-                                    <div class="hours-item">
-                                        <span class="day">Sunday</span>
-                                        <span class="time closed">Closed</span>
+                                    <div class="hours-list">
+                                        <div class="hours-item">
+                                            <span class="day">Monday - Friday</span>
+                                            <span class="time">8:00 AM - 6:00 PM</span>
+                                        </div>
+                                        
+                                        <div class="hours-item">
+                                            <span class="day">Saturday</span>
+                                            <span class="time">9:00 AM - 2:00 PM</span>
+                                        </div>
+                                        
+                                        <div class="hours-item">
+                                            <span class="day">Sunday</span>
+                                            <span class="time closed">Closed</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
-        </main>
+                </section>
+            </main>
 
-        @include('components.footer')
+            @include('components.footer')
+        </div>
     </div>
-</div>
+</body>
+</html>
 
 @push('scripts')
 <script>

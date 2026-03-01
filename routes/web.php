@@ -29,9 +29,7 @@ Route::get('/index', function () {
     return redirect()->route('home.index');
 });
 
-Route::get('/about', function () {
-    return view('about.about');
-})->name('about');
+Route::get('/about', [\App\Http\Controllers\HomeController::class, 'about'])->name('about');
 
 // ============================================================================
 // Public Product Routes
@@ -45,9 +43,7 @@ Route::get('/products/{id}', [ProductController::class, 'show'])->name('products
 // Contact Routes
 // ============================================================================
 
-Route::get('/contact', function () {
-    return view('contact.contact');
-})->name('contact.index');
+Route::get('/contact', [\App\Http\Controllers\HomeController::class, 'contact'])->name('contact.index');
 
 Route::post('/contact/inquiry', [ProductController::class, 'storeInquiry'])
     ->middleware('throttle:5,1')

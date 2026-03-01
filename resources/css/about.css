@@ -57,36 +57,35 @@
 
 /* Hero Section */
 .about-hero {
-    padding: 60px 0 80px;
-    text-align: center;
+    padding: 40px 0 20px;
+    text-align: justify;
     animation: fadeInUp 0.8s ease-out;
 }
 
 .page-title {
     color: var(--primary-color);
-    font-family: "Inter-Bold", sans-serif;
-    font-size: 48px;
-    line-height: 57.6px;
-    letter-spacing: 1.2px;
+    font-family: var(--font-sans), sans-serif;
+    font-size: 36px;
+    line-height: 1.2;
     font-weight: 700;
-    margin-bottom: 16px;
-    animation: slideDown 0.6s ease-out 0.2s both;
+    margin-bottom: 8px;
+    position: relative;
+    display: inline-block;
 }
 
 .page-subtitle {
     color: var(--text-gray);
-    font-family: "Inter-Regular", sans-serif;
-    font-size: 16px;
-    line-height: 25.6px;
+    font-family: var(--font-sans), sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
     font-weight: 400;
     max-width: 800px;
-    margin: 0 auto;
     animation: fadeInUp 0.8s ease-out 0.4s both;
 }
 
 /* Mission & Vision Section */
 .mission-vision-section {
-    padding: 40px 0 80px;
+    padding: 40px 0 40px;
     animation: fadeInUp 0.8s ease-out 0.6s both;
 }
 
@@ -122,16 +121,19 @@
 }
 
 .mission-card .card-icon-container {
-    background: linear-gradient(135deg, rgba(95, 177, 183, 0.3) 0%, rgba(47, 122, 133, 0.2) 100%);
+    background: #e0f2f1;
+    /* Light teal solid background */
 }
 
 .vision-card .card-icon-container {
-    background: linear-gradient(135deg, rgba(47, 122, 133, 0.2) 0%, rgba(95, 177, 183, 0.3) 100%);
+    background: #e0f2f1;
+    /* Light teal solid background */
 }
 
 .card-icon {
-    width: 112px;
-    height: 112px;
+    font-size: 80px;
+    /* Large icon size */
+    color: #2f7a85;
     transition: transform 0.5s ease;
 }
 
@@ -176,10 +178,9 @@
 
 .card-title {
     color: var(--primary-color);
-    font-family: "Inter-SemiBold", sans-serif;
+    font-family: var(--font-sans), sans-serif;
     font-size: 32px;
-    line-height: 24px;
-    letter-spacing: 0.4px;
+    line-height: 1.2;
     font-weight: 600;
     margin: 0;
     position: relative;
@@ -206,9 +207,9 @@
 
 .card-description {
     color: var(--text-dark);
-    font-family: "Inter-Regular", sans-serif;
-    font-size: 16px;
-    line-height: 26px;
+    font-family: var(--font-sans), sans-serif;
+    font-size: 17px;
+    line-height: 1.6;
     font-weight: 400;
     margin: 0;
 }
@@ -221,15 +222,14 @@
 }
 
 .certification-badge {
-    background: rgba(95, 177, 183, 0.2);
-    border: 1.25px solid rgba(95, 177, 183, 0.4);
-    border-radius: 9999px;
-    padding: 8px 20px;
+    background: rgba(95, 177, 183, 0.15);
+    border: 1.25px solid rgba(95, 177, 183, 0.3);
+    border-radius: 999px;
+    padding: 8px 24px;
     color: var(--secondary-color);
-    font-family: "Inter-Regular", sans-serif;
-    font-size: 16px;
-    line-height: 24px;
-    font-weight: 400;
+    font-family: var(--font-sans), sans-serif;
+    font-size: 15px;
+    font-weight: 500;
     transition: var(--transition);
 }
 
@@ -240,48 +240,35 @@
 
 /* Core Values Section */
 .values-section {
-    padding: 80px 0;
+    padding: 20px 0;
     background: linear-gradient(180deg, var(--light-bg) 0%, rgba(244, 249, 250, 0.8) 100%);
     animation: fadeInUp 0.8s ease-out 0.8s both;
 }
 
 .section-header {
-    text-align: center;
+    text-align: justify;
     margin-bottom: 60px;
 }
 
 .section-title {
     color: var(--primary-color);
-    font-family: "Inter-SemiBold", sans-serif;
+    font-family: var(--font-sans), sans-serif;
     font-size: 32px;
-    line-height: 41.6px;
-    letter-spacing: 0.8px;
+    line-height: 1.2;
     font-weight: 600;
     margin-bottom: 8px;
     position: relative;
     display: inline-block;
 }
 
-.section-title::after {
-    content: '';
-    position: absolute;
-    bottom: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 4px;
-    background: var(--accent-color);
-    border-radius: 2px;
-}
 
 .section-subtitle {
     color: var(--text-gray);
-    font-family: "Inter-Regular", sans-serif;
-    font-size: 16px;
-    line-height: 25.6px;
+    font-family: var(--font-sans), sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
     font-weight: 400;
     max-width: 600px;
-    margin: 24px auto 0;
 }
 
 .values-grid {
@@ -329,11 +316,11 @@
 
 .value-icon-container {
     flex-shrink: 0;
-    width: 56px;
-    height: 56px;
-    background: linear-gradient(135deg, rgba(95, 177, 183, 0.3) 0%, rgba(47, 122, 133, 0.2) 100%);
-    border: 1.25px solid rgba(95, 177, 183, 0.4);
-    border-radius: 9999px;
+    width: 64px;
+    height: 64px;
+    background: #e0f2f1;
+    border: 1.25px solid #5fb1b7;
+    border-radius: 999px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -341,13 +328,13 @@
 }
 
 .value-card:hover .value-icon-container {
-    transform: scale(1.1) rotate(10deg);
-    background: linear-gradient(135deg, rgba(95, 177, 183, 0.4) 0%, rgba(47, 122, 133, 0.3) 100%);
+    transform: scale(1.05);
+    background: #b2dfdb;
 }
 
 .value-icon {
-    width: 28px;
-    height: 28px;
+    font-size: 28px;
+    color: #2f7a85;
     transition: transform 0.3s ease;
 }
 
@@ -501,8 +488,7 @@
     }
 
     .card-icon {
-        width: 80px;
-        height: 80px;
+        font-size: 60px;
     }
 
     .card-title {
