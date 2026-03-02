@@ -13,6 +13,7 @@ class Sale extends Model
     protected $primaryKey = 'Sale_ID';
 
     protected $fillable = [
+        'Invoice_Number',
         'Quotation_ID',
         'Customer_ID',
         'Processed_By',

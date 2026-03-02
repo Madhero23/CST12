@@ -84,6 +84,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/customers/interaction', [CustomerController::class, 'addInteractionLog'])->name('customers.interaction');
     Route::get('/customers/{id}/interactions', [CustomerController::class, 'getInteractionLogs'])->name('customers.interactions');
     Route::get('/customers/reminders', [CustomerController::class, 'reminders'])->name('customers.reminders');
+    Route::put('/customers/quotation/{id}/status', [CustomerController::class, 'updateQuotationStatus'])->name('customers.quotation.status');  // FR-CRM-08
 
     // Finance Management
     Route::get('/finance', [FinanceController::class, 'index'])->name('finance');

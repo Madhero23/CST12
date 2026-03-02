@@ -43,6 +43,7 @@ class Inquiry extends Model
         'product_id',
         'product_name',
         'status',
+        'reference_number',
         'ip_address',
         'user_agent',
         'responded_at',

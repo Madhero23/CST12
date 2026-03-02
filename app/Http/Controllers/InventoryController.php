@@ -105,9 +105,9 @@ class InventoryController extends Controller
             $validated = $request->validate([
                 'product_id' => 'required|exists:products,Product_ID',
                 'quantity' => 'required|integer|min:1',
-                'location_id' => 'required|exists:locations,Location_ID', // Required now
+                'location_id' => 'required|exists:locations,Location_ID',
                 'transaction_date' => 'required|date',
-                'notes' => 'nullable|string',
+                'notes' => 'required|string|min:3',  // FR-INV-04: Reason required
             ]);
 
             $inventory = $this->inventoryService->recordStockOut(

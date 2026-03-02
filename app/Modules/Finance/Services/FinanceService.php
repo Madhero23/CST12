@@ -6,6 +6,7 @@ use App\Modules\Finance\Repositories\TransactionRepository;
 use App\Modules\Shared\Services\LoggingService;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Collection;
+use Exception;
 
 class FinanceService
 {
@@ -30,7 +31,13 @@ class FinanceService
         $subtotal = $totalAmount / (1 + ($taxRate / 100));
         $taxAmount = $totalAmount - $subtotal;
 
+        // FR-FIN-02: Auto-generate Invoice Number (INV-YYYY-NNNN)
+        $year = date('Y');
+        $count = \App\Models\Sale::whereYear('Sale_Date', $year)->count() + 1;
+        $invoiceNumber = 'INV-' . $year . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+
         $sale = \App\Models\Sale::create([
+            'Invoice_Number' => $invoiceNumber,
             'Customer_ID' => $data['customer_id'],
             'Processed_By' => $data['processed_by'],
             'Sale_Date' => $data['sale_date'],
@@ -52,6 +59,7 @@ class FinanceService
 
         $this->logger->logActivity('Invoice generated', null, [
             'sale_id' => $sale->Sale_ID,
+            'invoice_number' => $invoiceNumber,
             'total' => $totalAmount,
             'customer_id' => $data['customer_id']
         ]);
@@ -72,13 +80,25 @@ class FinanceService
         
         $method = $methodMapping[$data['payment_method']] ?? $data['payment_method'];
 
-        $sale->Amount_Paid += $data['amount_paid'];
+        // FR-FIN-07: Calculate outstanding balance
+        $outstandingBalance = $sale->Total_Amount_PHP - ($sale->Amount_Paid ?? 0);
+
+        // FR-FIN-06: Over-payment guard
+        if ($data['amount_paid'] > $outstandingBalance) {
+            throw new Exception("Over-payment rejected. Outstanding balance: ₱" . number_format($outstandingBalance, 2) . ". Amount attempted: ₱" . number_format($data['amount_paid'], 2));
+        }
+
+        $sale->Amount_Paid = ($sale->Amount_Paid ?? 0) + $data['amount_paid'];
         $sale->Payment_Method = $method;
         $sale->Last_Payment_Date = $data['payment_date'];
         $sale->Payment_Reference = $data['payment_reference'] ?? null;
 
-        if ($sale->Amount_Paid >= $sale->Total_Amount_PHP) {
+        // FR-FIN-07: Auto-status update (Pending → Partial → Completed)
+        $newOutstanding = $sale->Total_Amount_PHP - $sale->Amount_Paid;
+        if ($newOutstanding <= 0) {
             $sale->Status = 'Completed';
+        } elseif ($sale->Amount_Paid > 0) {
+            $sale->Status = 'Pending'; // Partial payment — stays Pending
         }
 
         $sale->save();
@@ -87,9 +107,11 @@ class FinanceService
             'sale_id' => $sale->Sale_ID,
             'amount_paid' => $data['amount_paid'],
             'total_paid' => $sale->Amount_Paid,
+            'outstanding' => $newOutstanding,
             'status' => $sale->Status
         ]);
 
         return $sale;
     }
 }
+

@@ -82,8 +82,19 @@ class InventoryService
         return DB::transaction(function () use ($productId, $locationId, $quantity, $transactionDate, $notes, $performedBy) {
             $inventory = $this->repository->findByProductAndLocation($productId, $locationId);
 
-            if (!$inventory || $inventory->Quantity_Available < $quantity) {
-                throw new Exception("Insufficient stock at the selected location.");
+            // FR-INV-02: Zero-stock guard
+            if (!$inventory || $inventory->Quantity_Available <= 0) {
+                throw new Exception("Cannot stock out: current stock is zero or unavailable.");
+            }
+
+            // FR-INV-03: Insufficient stock guard
+            if ($inventory->Quantity_Available < $quantity) {
+                throw new Exception("Insufficient stock. Available: {$inventory->Quantity_Available}, Requested: {$quantity}.");
+            }
+
+            // FR-INV-04: Reason/notes required for stock out
+            if (empty(trim($notes ?? ''))) {
+                throw new Exception("A reason (notes) is required for stock out transactions.");
             }
 
             // 1. Update Inventory (Negative quantity)
@@ -101,6 +112,26 @@ class InventoryService
                 'Performed_By' => $performedBy,
                 'Transaction_Date' => $transactionDate ?? now(),
             ]);
+
+            // FR-INV-07: Replenishment alert — check if stock fell below Min_Stock_Level
+            $product = $inventory->product;
+            if ($product && $updatedInventory->Quantity_On_Hand < ($product->Min_Stock_Level ?? 10)) {
+                DB::table('alert_logs')->insert([
+                    'Alert_Type' => 'LowStock',
+                    'Message' => "Low stock alert: {$product->Product_Name} has {$updatedInventory->Quantity_On_Hand} units remaining (Min: {$product->Min_Stock_Level}). Reorder quantity: {$product->Reorder_Quantity}.",
+                    'Related_Entity_Type' => 'Product',
+                    'Related_Entity_ID' => $productId,
+                    'Severity' => $updatedInventory->Quantity_On_Hand <= 0 ? 'Critical' : 'Warning',
+                    'Is_Read' => false,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                $this->logger->logWarning('Low stock alert created', [
+                    'product_id' => $productId,
+                    'current_stock' => $updatedInventory->Quantity_On_Hand,
+                    'min_stock_level' => $product->Min_Stock_Level,
+                ]);
+            }
 
             $this->logger->logActivity('Stock Out recorded', null, [
                 'product_id' => $productId,

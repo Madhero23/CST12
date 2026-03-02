@@ -66,7 +66,7 @@ class DocumentController extends Controller
                 'related_type'  => 'nullable|string|in:Customer,Product,Quotation,Sale',
                 'related_id'    => 'nullable|integer',
                 'document_type' => 'required|string',
-                'file'          => 'required|file|max:10240',
+                'file'          => 'required|file|mimes:pdf,docx,jpg,png,jpeg|max:10240',  // FR-DOC-06 & FR-DOC-07
                 'expiry_date'   => 'nullable|date',
                 'document_name' => 'nullable|string',
                 'additional_notes' => 'nullable|string',
@@ -74,6 +74,16 @@ class DocumentController extends Controller
 
             $file = $request->file('file');
             $path = $file->store('documents', 'public');
+
+            // FR-DOC-10: Auto-increment Version_Number for same entity+type combo
+            $versionNumber = 1;
+            if (!empty($validated['related_type']) && !empty($validated['related_id'])) {
+                $existing = Document::where('Related_Entity_Type', $validated['related_type'])
+                    ->where('Related_Entity_ID', $validated['related_id'])
+                    ->where('Document_Type', $validated['document_type'])
+                    ->max('Version_Number');
+                $versionNumber = ($existing ?? 0) + 1;
+            }
 
             $document = Document::create([
                 'Document_Type'       => $validated['document_type'],
@@ -87,7 +97,7 @@ class DocumentController extends Controller
                 'Uploaded_By'         => auth()->id() ?? 1,
                 'Expiry_Date'         => $validated['expiry_date'] ?? null,
                 'Status'              => 'Active',
-                'Version_Number'      => 1,
+                'Version_Number'      => $versionNumber,  // FR-DOC-10
                 'Additional_Notes'    => $validated['additional_notes'] ?? null,
             ]);
 
@@ -278,6 +288,18 @@ class DocumentController extends Controller
                 'terms_conditions' => 'nullable|string',
                 'branding_color'   => 'nullable|string|max:7',
             ]);
+
+            // FR-DOC-05: Unique constraint on Template_Name + Template_Type
+            $existingTemplate = \App\Models\QuotationTemplate::where('Template_Name', $validated['template_name'])
+                ->where('Template_Type', $validated['template_type'])
+                ->where('Template_ID', '!=', $request->template_id ?? 0)
+                ->first();
+            if ($existingTemplate) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'A template with this name and type already exists.',
+                ], 422);
+            }
 
             $template = \App\Models\QuotationTemplate::updateOrCreate(
                 ['Template_ID' => $request->template_id],

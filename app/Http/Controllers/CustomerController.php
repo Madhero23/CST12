@@ -99,7 +99,7 @@ class CustomerController extends Controller
                 'Segment_Type' => 'nullable|in:HighValue,MediumValue,LowValue,Prospect',
                 'Contact_Person' => 'nullable|string|max:255',
                 'Email' => 'required|email|unique:customers,Email',
-                'Phone' => 'nullable|string|max:20',
+                'Phone' => ['nullable', 'string', 'regex:/^[0-9]{10,11}$/'],  // FR-CRM-03
                 'Address' => 'nullable|string',
                 'Status' => 'nullable|in:Active,Inactive,OnHold',
                 'Payment_Terms_Preference' => 'nullable|string',
@@ -142,11 +142,24 @@ class CustomerController extends Controller
                 'Segment_Type' => 'nullable|in:HighValue,MediumValue,LowValue,Prospect',
                 'Contact_Person' => 'nullable|string|max:255',
                 'Email' => 'sometimes|required|email|unique:customers,Email,' . $id . ',Customer_ID',
-                'Phone' => 'nullable|string|max:20',
+                'Phone' => ['nullable', 'string', 'regex:/^[0-9]{10,11}$/'],  // FR-CRM-03
                 'Address' => 'nullable|string',
                 'Status' => 'nullable|in:Active,Inactive,OnHold',
                 'Payment_Terms_Preference' => 'nullable|string',
             ]);
+
+            // FR-CRM-04: isDirty guard — return "No changes" if nothing was modified
+            $customer = \App\Models\Customer::findOrFail($id);
+            $hasChanges = false;
+            foreach ($validated as $key => $value) {
+                if ($customer->$key != $value) {
+                    $hasChanges = true;
+                    break;
+                }
+            }
+            if (!$hasChanges) {
+                return response()->json(['success' => true, 'message' => 'No changes detected.', 'customer' => $customer]);
+            }
 
             $customer = $this->customerService->updateCustomer($id, $validated);
 
@@ -253,10 +266,10 @@ class CustomerController extends Controller
             ]);
 
             return \Illuminate\Support\Facades\DB::transaction(function () use ($validated) {
-                // Generate Quotation Number (e.g., QT-2026-0001)
+                // FR-CRM-07: Generate Quotation Number (QUO-YYYY-NNNN)
                 $year = date('Y');
                 $count = \App\Models\Quotation::whereYear('created_at', $year)->count() + 1;
-                $quoteNumber = 'QT-' . $year . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
+                $quoteNumber = 'QUO-' . $year . '-' . str_pad($count, 4, '0', STR_PAD_LEFT);
 
                 // Consistent with Finance module: VAT Inclusive (12%)
                 // Total = Subtotal * 1.12 => Subtotal = Total / 1.12
@@ -326,8 +339,8 @@ class CustomerController extends Controller
                 'customer_id' => 'required|exists:customers,Customer_ID',
                 'Interaction_Type' => 'required|string',
                 'Subject' => 'required|string',
-                'Details' => 'required|string',
-                'Follow_Up_Date' => 'nullable|date',
+                'Details' => 'required|string',  // FR-CRM-10: Notes required
+                'Follow_Up_Date' => 'nullable|date|after:today',  // FR-CRM-11: Must be future date
             ]);
             
             $log = \App\Models\CustomerInteractionLog::create([
@@ -419,6 +432,66 @@ class CustomerController extends Controller
         } catch (Throwable $e) {
             $this->logger->logError($e, 'Failed to fetch reminders');
             return response()->json(['success' => false, 'message' => 'Failed to fetch reminders'], 500);
+        }
+    }
+
+    /**
+     * FR-CRM-08: Update quotation status with transition guard
+     *
+     * Allowed transitions:
+     *   Draft   → Sent, Pending
+     *   Sent    → Pending, Won, Lost
+     *   Pending → Approved, Won, Lost
+     */
+    private static array $allowedTransitions = [
+        'Draft'   => ['Sent', 'Pending'],
+        'Sent'    => ['Pending', 'Won', 'Lost'],
+        'Pending' => ['Approved', 'Won', 'Lost'],
+    ];
+
+    public function updateQuotationStatus(Request $request, int $id): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'status' => 'required|in:Draft,Sent,Pending,Approved,Won,Lost',
+                'notes'  => 'nullable|string|max:500',
+            ]);
+
+            $quotation = \App\Models\Quotation::findOrFail($id);
+            $currentStatus = $quotation->Status;
+            $newStatus = $validated['status'];
+
+            // Guard: check if the transition is allowed
+            $allowed = self::$allowedTransitions[$currentStatus] ?? [];
+            if (!in_array($newStatus, $allowed)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Invalid status transition: {$currentStatus} → {$newStatus}. Allowed: " . implode(', ', $allowed),
+                ], 422);
+            }
+
+            $quotation->update([
+                'Status' => $newStatus,
+                'Status_Notes' => $validated['notes'] ?? null,
+                'Conversion_Date' => in_array($newStatus, ['Won', 'Approved']) ? now() : $quotation->Conversion_Date,
+                'Reason_For_Loss' => $newStatus === 'Lost' ? ($validated['notes'] ?? null) : $quotation->Reason_For_Loss,
+            ]);
+
+            $this->logger->logActivity('Quotation status updated', null, [
+                'quotation_id' => $id,
+                'from' => $currentStatus,
+                'to' => $newStatus,
+            ]);
+
+            return response()->json(['success' => true, 'quotation' => $quotation->fresh()]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['success' => false, 'message' => 'Quotation not found.'], 404);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['success' => false, 'errors' => $e->errors()], 422);
+        } catch (Throwable $e) {
+            $this->logger->logError($e, 'Failed to update quotation status', ['quotation_id' => $id]);
+            return response()->json(['success' => false, 'message' => 'Failed to update status.'], 500);
         }
     }
 }

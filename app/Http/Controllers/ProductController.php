@@ -101,6 +101,10 @@ class ProductController extends Controller
             
             // Create the inquiry in database
             $inquiry = \App\Models\Inquiry::create($validated);
+
+            // FR-PC-06: Generate reference number (INQ-YYYY-NNNN)
+            $refNumber = 'INQ-' . date('Y') . '-' . str_pad($inquiry->id, 4, '0', STR_PAD_LEFT);
+            $inquiry->update(['reference_number' => $refNumber]);
             
             // Send email notification to admin
             try {
@@ -137,6 +141,7 @@ class ProductController extends Controller
             // Log the successful inquiry submission
             $this->logger->logActivity('Product inquiry submitted', null, [
                 'inquiry_id' => $inquiry->id,
+                'reference_number' => $refNumber,
                 'product_id' => $validated['product_id'] ?? null,
                 'email' => $validated['email'],
                 'subject' => $validated['subject'],
@@ -144,8 +149,9 @@ class ProductController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Thank you for your inquiry! We have received your message and will get back to you shortly.',
+                'message' => "Thank you for your inquiry! Reference: {$refNumber}. We will get back to you shortly.",
                 'inquiry_id' => $inquiry->id,
+                'reference_number' => $refNumber,
             ], 200);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
