@@ -246,4 +246,26 @@ class InventoryController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Complete a transfer (stub — not yet implemented)
+     */
+    public function completeTransfer(Request $request, int $id): JsonResponse
+    {
+        return response()->json([
+            'success' => false,
+            'message' => 'Transfer completion is not yet implemented.',
+        ], 501);
+    }
+
+    /**
+     * Record a barcode/QR scan (stub — not yet implemented)
+     */
+    public function recordScan(Request $request): JsonResponse
+    {
+        return response()->json([
+            'success' => false,
+            'message' => 'Barcode scanning is not yet implemented.',
+        ], 501);
+    }
 }

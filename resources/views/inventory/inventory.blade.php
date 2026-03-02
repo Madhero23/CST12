@@ -41,13 +41,41 @@
                     </div>
                 </div>
                 
+                <!-- Filters and Search -->
+                <div class="inventory-controls">
+                    <div class="search-container">
+                        <div class="search-input-wrapper">
+                            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <input type="text" class="inv-search-input" placeholder="Search by item or code...">
+                        </div>
+                    </div>
+                    <div class="filter-container">
+                        <select class="inv-status-filter">
+                            <option value="all">All Status</option>
+                            <option value="good">Good Stock</option>
+                            <option value="low">Low Stock</option>
+                            <option value="out">Out of Stock</option>
+                        </select>
+                    </div>
+                    <div class="filter-container">
+                        <select class="inv-location-filter">
+                            <option value="all">All Locations</option>
+                            @foreach($locations as $loc)
+                                <option value="{{ $loc->Location_Name }}">{{ $loc->Location_Name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                
                 <!-- Inventory Table -->
                 <div class="inventory-table-container">
                     <table class="inventory-table">
                         <thead>
                             <tr>
+                                <th>Product Code</th>
                                 <th>Item</th>
                                 <th>Quantity</th>
+                                <th>Value (₱)</th>
                                 <th>Location</th>
                                 <th>Status</th>
                                 <th>Actions</th>
@@ -65,12 +93,19 @@
                             <tr class="inventory-row" 
                                 data-index="{{ $index }}"
                                 data-status="{{ $status }}"
+                                data-location="{{ $item->location->Location_Name ?? 'N/A' }}"
                                 data-id="{{ $item->product->Product_ID ?? $item->id }}">
+                                <td class="code-cell">
+                                    <span class="product-code">{{ $item->product->Product_Code ?? '—' }}</span>
+                                </td>
                                 <td class="item-cell">
                                     <div class="item-name">{{ $item->product->Product_Name ?? 'Unknown' }}</div>
                                 </td>
                                 <td class="quantity-cell">
                                     <div class="item-quantity">{{ $qty }}</div>
+                                </td>
+                                <td class="value-cell">
+                                    <span class="value-text">₱{{ number_format($item->Value_PHP ?? 0, 2) }}</span>
                                 </td>
                                 <td class="location-cell">
                                     <div class="item-location">
@@ -102,7 +137,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="empty-state">No inventory items found.</td>
+                                <td colspan="7" class="empty-state">No inventory items found.</td>
                             </tr>
                             @endforelse
                         </tbody>
@@ -158,13 +193,13 @@
                 
                 <div class="transfer-list">
                     @forelse($transfers as $transfer)
-                    <div class="transfer-item" data-id="{{ $transfer->id }}">
+                    <div class="transfer-item" data-id="{{ $transfer->Transaction_ID }}">
                         <div class="transfer-info">
                             <div class="transfer-name">{{ $transfer->product->Product_Name ?? 'Unknown' }}</div>
-                            <div class="transfer-route">{{ $transfer->fromLocation->Location_Name ?? '?' }} &rarr; {{ $transfer->toLocation->Location_Name ?? '?' }}</div>
+                            <div class="transfer-route">{{ $transfer->sourceLocation->Location_Name ?? '?' }} &rarr; {{ $transfer->destinationLocation->Location_Name ?? '?' }}</div>
                         </div>
-                        <div class="transfer-status status-{{ $transfer->status }}">
-                            {{ ucfirst($transfer->status) }}
+                        <div class="transfer-status status-completed">
+                            Completed
                         </div>
                     </div>
                     @empty
@@ -266,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const body = `
             <form id="stockInForm" class="inv-modal-form">
                 <div class="inv-form-group">
-                    <label>Product ID</label>
+                    <label>Product <span class="required">*</span></label>
                     <select name="product_id" class="inv-form-select" required>
                         ${productOptions}
                     </select>
@@ -346,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const body = `
             <form id="stockOutForm" class="inv-modal-form">
                 <div class="inv-form-group">
-                    <label>Product ID</label>
+                    <label>Product <span class="required">*</span></label>
                     <select name="product_id" class="inv-form-select" required>
                         ${productOptions}
                     </select>
@@ -370,8 +405,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
 
                 <div class="inv-form-group">
-                    <label>Reason</label>
-                    <input type="text" name="notes" class="inv-form-input" placeholder="e.g., Sale, Damage, Internal Use">
+                    <label>Reason <span class="required">*</span></label>
+                    <input type="text" name="notes" class="inv-form-input" placeholder="e.g., Sale, Damage, Internal Use" required>
                 </div>
 
                 <div class="inv-form-alert warning">
@@ -737,6 +772,37 @@ document.addEventListener('DOMContentLoaded', function() {
         row.style.transition = 'all 0.3s ease';
         setTimeout(() => { row.style.opacity = '1'; row.style.transform = 'translateY(0)'; }, i * 80 + 200);
     });
+
+    // ========== UNIFIED FILTER FUNCTION ==========
+
+    function applyInventoryFilters() {
+        const searchTerm = document.querySelector('.inv-search-input')?.value.toLowerCase() || '';
+        const selectedStatus = document.querySelector('.inv-status-filter')?.value || 'all';
+        const selectedLocation = document.querySelector('.inv-location-filter')?.value || 'all';
+        const rows = document.querySelectorAll('.inventory-row');
+
+        rows.forEach(row => {
+            const itemName = row.querySelector('.item-name')?.textContent.toLowerCase() || '';
+            const productCode = row.querySelector('.product-code')?.textContent.toLowerCase() || '';
+            const rowStatus = row.dataset.status;
+            const rowLocation = row.dataset.location;
+
+            const matchesSearch = !searchTerm || itemName.includes(searchTerm) || productCode.includes(searchTerm);
+            const matchesStatus = selectedStatus === 'all' || selectedStatus === rowStatus;
+            const matchesLocation = selectedLocation === 'all' || selectedLocation === rowLocation;
+
+            if (matchesSearch && matchesStatus && matchesLocation) {
+                row.style.display = '';
+                row.style.animation = 'fadeIn 0.3s ease';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    document.querySelector('.inv-search-input')?.addEventListener('input', applyInventoryFilters);
+    document.querySelector('.inv-status-filter')?.addEventListener('change', applyInventoryFilters);
+    document.querySelector('.inv-location-filter')?.addEventListener('change', applyInventoryFilters);
 
     document.querySelectorAll('.action-btn, .transfer-btn').forEach(btn => {
         btn.addEventListener('mouseenter', function() { this.style.transform = 'translateY(-2px)'; });

@@ -157,6 +157,86 @@
     filter: brightness(0) invert(1);
 }
 
+/* Inventory Controls (Search + Filters) */
+.inventory-controls {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.inventory-controls .search-container {
+    flex: 1;
+    min-width: 200px;
+}
+
+.inventory-controls .search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.inventory-controls .search-icon {
+    position: absolute;
+    left: 14px;
+    color: #9ca3af;
+    pointer-events: none;
+}
+
+.inv-search-input {
+    width: 100%;
+    padding: 10px 16px 10px 42px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1f2937;
+    transition: var(--transition);
+}
+
+.inv-search-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(95, 177, 183, 0.1);
+}
+
+.inventory-controls .filter-container {
+    min-width: 160px;
+}
+
+.inv-status-filter,
+.inv-location-filter {
+    width: 100%;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 40px 10px 16px;
+    font-size: 14px;
+    color: #1f2937;
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath fill='%236b7280' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+}
+
+/* Product Code Column */
+.code-cell .product-code {
+    color: #6b7280;
+    font-size: 13px;
+    font-family: 'Courier New', monospace;
+    font-weight: 500;
+}
+
+/* Value Column */
+.value-cell .value-text {
+    color: var(--text-dark);
+    font-size: 14px;
+    font-weight: 600;
+}
+
 /* Inventory Table */
 .inventory-table-container {
     margin-bottom: 24px;
