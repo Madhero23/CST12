@@ -487,3 +487,81 @@
 .btn-delete:hover {
     background: #B91C1C;
 }
+
+/* Product Code Column */
+.product-code {
+    color: #6b7280;
+    font-size: 13px;
+    font-family: 'Courier New', monospace;
+    font-weight: 500;
+}
+
+/* Price Column */
+.price-text {
+    color: #1f2937;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+    text-transform: capitalize;
+}
+
+.status-badge.status-active {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.status-badge.status-inactive {
+    background: #e5e7eb;
+    color: #6b7280;
+}
+
+.status-badge.status-discontinued {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* Status Filter */
+.status-filter {
+    width: 100%;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 40px 10px 16px;
+    font-size: 14px;
+    color: #1f2937;
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath fill='%236b7280' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+}
+
+/* File Input & Hint */
+.file-input {
+    padding: 10px 16px;
+    cursor: pointer;
+}
+
+.form-hint {
+    display: block;
+    color: #9ca3af;
+    font-size: 12px;
+    margin-top: 6px;
+}
+
+/* No Results */
+.no-results {
+    text-align: center;
+    padding: 40px 16px;
+    color: #9ca3af;
+    font-size: 14px;
+}

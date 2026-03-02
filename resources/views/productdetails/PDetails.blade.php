@@ -45,6 +45,15 @@
                         </select>
                     </div>
                     
+                    <div class="filter-container">
+                        <select class="status-filter">
+                            <option value="all">All Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Discontinued">Discontinued</option>
+                        </select>
+                    </div>
+                    
                     <button class="add-product-btn">
                         <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         <span>Add Product</span>
@@ -56,35 +65,54 @@
                     <table class="products-table">
                         <thead>
                             <tr>
+                                <th class="table-header-cell">Product Code</th>
                                 <th class="table-header-cell">Product Name</th>
                                 <th class="table-header-cell">Category</th>
+                                <th class="table-header-cell">Price (₱)</th>
+                                <th class="table-header-cell">Status</th>
                                 <th class="table-header-cell">Availability</th>
                                 <th class="table-header-cell">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($products as $index => $product)
-                            <tr class="table-row" data-product-id="{{ $product->Product_ID }}" data-category="{{ $product->Category }}">
+                            <tr class="table-row" data-product-id="{{ $product->Product_ID }}" data-category="{{ $product->Category }}" data-status="{{ $product->Status }}">
+                                <td class="table-cell code-cell">
+                                    <span class="product-code">{{ $product->Product_Code ?? '—' }}</span>
+                                </td>
                                 <td class="table-cell product-name-cell">
                                     <span class="product-name">{{ $product->Product_Name }}</span>
                                 </td>
                                 <td class="table-cell category-cell">
                                     <span class="category-text">{{ $categories[$product->Category] ?? $product->Category }}</span>
                                 </td>
+                                <td class="table-cell price-cell">
+                                    <span class="price-text">₱{{ number_format($product->Unit_Price_PHP, 2) }}</span>
+                                </td>
+                                <td class="table-cell status-cell">
+                                    @php
+                                        $statusClass = match($product->Status) {
+                                            'Active' => 'status-active',
+                                            'Inactive' => 'status-inactive',
+                                            'Discontinued' => 'status-discontinued',
+                                            default => 'status-active',
+                                        };
+                                    @endphp
+                                    <span class="status-badge {{ $statusClass }}">{{ $product->Status }}</span>
+                                </td>
                                 <td class="table-cell availability-cell">
                                     @php
-                                        // Logic for availability matching Image 1 pills
+                                        $stockQty = $product->inventories->sum('Quantity_On_Hand');
+                                        $minStock = $product->Min_Stock_Level ?? 10;
                                         $availabilityClass = 'in-stock';
-                                        $availabilityText = 'In Stock';
+                                        $availabilityText = 'In Stock (' . $stockQty . ')';
                                         
-                                        // Simple logic based on stock (assuming Product has enough fields or we use Inventory)
-                                        // For now using placeholder logic as per previous version but styled better
-                                        if (($product->Quantity_On_Hand ?? 0) <= 0) {
+                                        if ($stockQty <= 0) {
                                             $availabilityClass = 'out-of-stock';
                                             $availabilityText = 'Out of Stock';
-                                        } elseif (($product->Quantity_On_Hand ?? 0) < 10) {
+                                        } elseif ($stockQty <= $minStock) {
                                             $availabilityClass = 'low-stock';
-                                            $availabilityText = 'Low Stock';
+                                            $availabilityText = 'Low Stock (' . $stockQty . ')';
                                         }
                                     @endphp
                                     <span class="availability-badge {{ $availabilityClass }}">
@@ -104,7 +132,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="4" class="no-results">
+                                <td colspan="7" class="no-results">
                                     No products found.
                                 </td>
                             </tr>
@@ -126,29 +154,47 @@
             <button class="modal-close" onclick="closeModal('addProductModal')">&times;</button>
         </div>
         
-        <form id="addProductForm" class="modal-form">
+        <form id="addProductForm" class="modal-form" enctype="multipart/form-data">
             @csrf
             
-            <div class="form-group">
-                <label class="form-label">Product Name</label>
-                <input type="text" name="Product_Name" class="form-input" placeholder="Enter product name" required>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Category</label>
-                <div class="select-wrapper">
-                    <select name="Category" class="form-select" required>
-                        <option value="" disabled selected>Select Category...</option>
-                        @foreach($categories as $value => $label)
-                            <option value="{{ $value }}">{{ $label }}</option>
-                        @endforeach
-                    </select>
+            <div class="form-row">
+                <div class="form-group flex-1">
+                    <label class="form-label">Product Name</label>
+                    <input type="text" name="Product_Name" class="form-input" placeholder="Enter product name" required>
+                </div>
+                <div class="form-group flex-1">
+                    <label class="form-label">Product Code (SKU)</label>
+                    <input type="text" name="Product_Code" class="form-input" placeholder="Auto-generated if empty">
                 </div>
             </div>
             
             <div class="form-row">
                 <div class="form-group flex-1">
-                    <label class="form-label">Price (PhP)</label>
+                    <label class="form-label">Category</label>
+                    <div class="select-wrapper">
+                        <select name="Category" class="form-select" required>
+                            <option value="" disabled selected>Select Category...</option>
+                            @foreach($categories as $value => $label)
+                                <option value="{{ $value }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group flex-1">
+                    <label class="form-label">Status</label>
+                    <div class="select-wrapper">
+                        <select name="Status" class="form-select" required>
+                            <option value="Active" selected>Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Discontinued">Discontinued</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group flex-1">
+                    <label class="form-label">Price (₱)</label>
                     <input type="number" name="Unit_Price_PHP" class="form-input" placeholder="0.00" step="0.01" min="0" required>
                 </div>
                 <div class="form-group flex-1">
@@ -158,8 +204,14 @@
             </div>
             
             <div class="form-group">
+                <label class="form-label">Product Image</label>
+                <input type="file" name="product_image" class="form-input file-input" accept="image/jpeg,image/png">
+                <small class="form-hint">JPG or PNG, max 2MB</small>
+            </div>
+            
+            <div class="form-group">
                 <label class="form-label">Description</label>
-                <textarea name="Description" class="form-textarea" placeholder="Product description..." rows="4" required></textarea>
+                <textarea name="Description" class="form-textarea" placeholder="Product description..." rows="3" required></textarea>
             </div>
             
             <div class="modal-footer">
@@ -179,42 +231,49 @@
             <button class="modal-close" onclick="closeModal('editProductModal')">&times;</button>
         </div>
         
-        <form id="editProductForm" class="modal-form">
+        <form id="editProductForm" class="modal-form" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <input type="hidden" id="edit_product_id" name="product_id">
             
-            <div class="form-group">
-                <label class="form-label">Product Name</label>
-                <input type="text" id="edit_product_name" name="Product_Name" class="form-input" placeholder="Enter product name" required>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Category</label>
-                <div class="select-wrapper">
-                    <select id="edit_category" name="Category" class="form-select" required>
-                        <option value="" disabled>Select Category...</option>
-                        @foreach($categories as $value => $label)
-                            <option value="{{ $value }}">{{ $label }}</option>
-                        @endforeach
-                    </select>
+            <div class="form-row">
+                <div class="form-group flex-1">
+                    <label class="form-label">Product Name</label>
+                    <input type="text" id="edit_product_name" name="Product_Name" class="form-input" placeholder="Enter product name" required>
                 </div>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Availability</label>
-                <div class="select-wrapper">
-                    <select id="edit_status" name="Status" class="form-select" required>
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                        <option value="Discontinued">Discontinued</option>
-                    </select>
+                <div class="form-group flex-1">
+                    <label class="form-label">Product Code (SKU)</label>
+                    <input type="text" id="edit_product_code" name="Product_Code" class="form-input" placeholder="Product Code" readonly>
                 </div>
             </div>
             
             <div class="form-row">
                 <div class="form-group flex-1">
-                    <label class="form-label">Price (PhP)</label>
+                    <label class="form-label">Category</label>
+                    <div class="select-wrapper">
+                        <select id="edit_category" name="Category" class="form-select" required>
+                            <option value="" disabled>Select Category...</option>
+                            @foreach($categories as $value => $label)
+                                <option value="{{ $value }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group flex-1">
+                    <label class="form-label">Status</label>
+                    <div class="select-wrapper">
+                        <select id="edit_status" name="Status" class="form-select" required>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Discontinued">Discontinued</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group flex-1">
+                    <label class="form-label">Price (₱)</label>
                     <input type="number" id="edit_price_php" name="Unit_Price_PHP" class="form-input" placeholder="0.00" step="0.01" min="0" required>
                 </div>
                 <div class="form-group flex-1">
@@ -224,8 +283,14 @@
             </div>
             
             <div class="form-group">
+                <label class="form-label">Product Image</label>
+                <input type="file" name="product_image" class="form-input file-input" accept="image/jpeg,image/png">
+                <small class="form-hint">JPG or PNG, max 2MB. Leave empty to keep current image.</small>
+            </div>
+            
+            <div class="form-group">
                 <label class="form-label">Description</label>
-                <textarea id="edit_description" name="Description" class="form-textarea" placeholder="Product description..." rows="4" required></textarea>
+                <textarea id="edit_description" name="Description" class="form-textarea" placeholder="Product description..." rows="3" required></textarea>
             </div>
             
             <div class="modal-footer">
@@ -512,42 +577,37 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Search functionality
-    const searchInput = document.querySelector('.search-input');
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
+    // Unified filter function — combines search, category, and status
+    function applyFilters() {
+        const searchTerm = document.querySelector('.search-input').value.toLowerCase();
+        const selectedCategory = document.querySelector('.category-filter').value;
+        const selectedStatus = document.querySelector('.status-filter').value;
         const rows = document.querySelectorAll('.table-row');
         
         rows.forEach(row => {
             const productName = row.querySelector('.product-name').textContent.toLowerCase();
+            const productCode = row.querySelector('.product-code')?.textContent.toLowerCase() || '';
             const category = row.querySelector('.category-text').textContent.toLowerCase();
+            const rowCategory = row.dataset.category;
+            const rowStatus = row.dataset.status;
             
-            if (productName.includes(searchTerm) || category.includes(searchTerm)) {
+            const matchesSearch = !searchTerm || productName.includes(searchTerm) || productCode.includes(searchTerm) || category.includes(searchTerm);
+            const matchesCategory = selectedCategory === 'all' || selectedCategory === rowCategory;
+            const matchesStatus = selectedStatus === 'all' || selectedStatus === rowStatus;
+            
+            if (matchesSearch && matchesCategory && matchesStatus) {
                 row.style.display = '';
                 row.style.animation = 'fadeIn 0.3s ease';
             } else {
                 row.style.display = 'none';
             }
         });
-    });
+    }
     
-    // Category filter functionality
-    const categoryFilter = document.querySelector('.category-filter');
-    categoryFilter.addEventListener('change', function() {
-        const selectedCategory = this.value;
-        const rows = document.querySelectorAll('.table-row');
-        
-        rows.forEach(row => {
-            const category = row.dataset.category;
-            
-            if (selectedCategory === 'all' || selectedCategory === category) {
-                row.style.display = '';
-                row.style.animation = 'fadeIn 0.3s ease';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    });
+    // Attach filter listeners
+    document.querySelector('.search-input').addEventListener('input', applyFilters);
+    document.querySelector('.category-filter').addEventListener('change', applyFilters);
+    document.querySelector('.status-filter').addEventListener('change', applyFilters);
     
     // Add product button click
     addProductBtn.addEventListener('click', function(e) {
@@ -610,10 +670,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (product) {
                     document.getElementById('edit_product_id').value = product.Product_ID;
                     document.getElementById('edit_product_name').value = product.Product_Name;
+                    document.getElementById('edit_product_code').value = product.Product_Code || '';
                     document.getElementById('edit_category').value = product.Category;
-                    document.getElementById('edit_description').value = product.Description;
+                    document.getElementById('edit_description').value = product.Description || '';
                     document.getElementById('edit_price_php').value = product.Unit_Price_PHP;
-                    document.getElementById('edit_stock_quantity').value = product.Stock_Quantity;
+                    document.getElementById('edit_stock_quantity').value = product.Stock_Quantity || 0;
                     document.getElementById('edit_status').value = product.Status || 'Active';
                     
                     document.getElementById('editProductModal').style.display = 'flex';

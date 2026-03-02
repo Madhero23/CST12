@@ -236,6 +236,10 @@ class ProductController extends Controller
             ];
 
             $products = $this->productService->getAllProducts($filters);
+
+            // Eager-load inventories so the Blade template can show real stock levels
+            $products->load('inventories');
+
             return view('productdetails.PDetails', compact('products', 'categories'));
 
         } catch (Throwable $e) {
@@ -362,7 +366,13 @@ class ProductController extends Controller
     {
         try {
             $product = $this->productService->getProductById($id);
-            return response()->json($product);
+            $product->load('inventories');
+
+            // Include stock quantity from inventories for the Edit modal
+            $productData = $product->toArray();
+            $productData['Stock_Quantity'] = $product->inventories->sum('Quantity_On_Hand');
+
+            return response()->json($productData);
         } catch (NotFoundException $e) {
             return response()->json(['error' => 'Product not found'], 404);
         } catch (Throwable $e) {
