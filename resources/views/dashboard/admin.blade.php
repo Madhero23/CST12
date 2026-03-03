@@ -47,6 +47,18 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="stat-card stat-blue">
+                    <div class="stat-content">
+                        <div class="stat-info">
+                            <p class="stat-label">Total Revenue</p>
+                            <p class="stat-value">₱{{ number_format($stats['total_revenue'] ?? 0, 0) }}</p>
+                        </div>
+                        <div class="stat-icon-container">
+                            <i class="stat-icon fas fa-peso-sign"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -63,7 +75,7 @@
                         <div class="activity-list">
                             @forelse($recentActivities as $activity)
                                 <div class="activity-item">
-                                    <div class="activity-indicator {{ ($activity['type'] ?? '') == 'Critical' ? 'indicator-red' : '' }}"></div>
+                                    <div class="activity-indicator indicator-{{ strtolower($activity['type'] ?? 'system') }}"></div>
                                     <div class="activity-content">
                                         <p class="activity-title">{{ $activity['title'] }}</p>
                                         <p class="activity-detail">{{ $activity['detail'] }}</p>
@@ -122,12 +134,38 @@
             </div>
         </div>
 
+        <!-- Quotation Pipeline -->
+        <section class="pipeline-section">
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">Quotation Pipeline</h2>
+                    <a href="/admin/customers" class="view-all-link">View All</a>
+                </div>
+                <div class="pipeline-list">
+                    @forelse($quotePipeline as $quote)
+                        <div class="pipeline-item">
+                            <div class="pipeline-info">
+                                <span class="pipeline-id">{{ $quote->Quotation_Number }}</span>
+                                <span class="pipeline-customer">{{ $quote->customer->Institution_Name ?? 'N/A' }}</span>
+                            </div>
+                            <div class="pipeline-right">
+                                <span class="pipeline-amount">₱{{ number_format($quote->Total_Amount_PHP, 0) }}</span>
+                                <span class="pipeline-status status-{{ strtolower($quote->Status) }}">{{ $quote->Status }}</span>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="empty-state">No active quotations.</div>
+                    @endforelse
+                </div>
+            </div>
+        </section>
+
         <!-- Upcoming Follow-ups -->
         <section class="follow-ups-section">
             <div class="section-card">
                 <div class="section-header">
                     <h2 class="section-title">Upcoming Follow-ups</h2>
-                    <a href="#" class="view-all-link">View All</a>
+                    <a href="/admin/customers" class="view-all-link">View All</a>
                 </div>
                 
                 <div class="follow-ups-list">
@@ -137,7 +175,7 @@
                                 <h3 class="follow-up-title">{{ $followUp->customer->Institution_Name ?? 'Unknown Institution' }}</h3>
                                 <p class="follow-up-detail">{{ $followUp->Subject }} - Due {{ \Carbon\Carbon::parse($followUp->Follow_Up_Date)->format('M d, Y') }}</p>
                             </div>
-                            <button class="view-btn" onclick="window.location.href='/admin/customers/{{ $followUp->Customer_ID }}'">View</button>
+                            <a class="view-btn" href="/admin/customers">View</a>
                         </div>
                     @empty
                         <div class="empty-state">No upcoming follow-ups.</div>
@@ -220,42 +258,6 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.transform = 'translateX(0)';
             this.style.boxShadow = 'none';
         });
-        
-        // Button click animation
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Add ripple effect
-            const ripple = document.createElement('span');
-            const rect = this.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = e.clientX - rect.left - size / 2;
-            const y = e.clientY - rect.top - size / 2;
-            
-            ripple.style.cssText = `
-                position: absolute;
-                border-radius: 50%;
-                background: rgba(95, 177, 183, 0.4);
-                transform: scale(0);
-                animation: ripple 0.6s linear;
-                width: ${size}px;
-                height: ${size}px;
-                left: ${x}px;
-                top: ${y}px;
-                z-index: 1;
-            `;
-            
-            this.appendChild(ripple);
-            
-            // Remove ripple after animation
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
-            
-            // Navigate to follow-up details
-            const followUpTitle = this.closest('.follow-up-item').querySelector('.follow-up-title').textContent;
-            console.log('Viewing follow-up for:', followUpTitle);
-        });
     });
     
     // Navigation item hover effects
@@ -283,43 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Real-time updates simulation
-    function simulateRealTimeUpdates() {
-        // Update stats every 30 seconds
-        setInterval(() => {
-            const pendingInquiries = document.querySelector('.stat-warning .stat-value');
-            const completedToday = document.querySelector('.stat-success .stat-value');
-            
-            if (Math.random() > 0.7) {
-                // Simulate new inquiry
-                let current = parseInt(pendingInquiries.textContent);
-                pendingInquiries.textContent = (current + 1).toString();
-                pendingInquiries.style.animation = 'pulse 1s ease';
-                setTimeout(() => {
-                    pendingInquiries.style.animation = '';
-                }, 1000);
-            }
-            
-            if (Math.random() > 0.8) {
-                // Simulate completed task
-                let currentPending = parseInt(pendingInquiries.textContent);
-                let currentCompleted = parseInt(completedToday.textContent);
-                
-                if (currentPending > 0) {
-                    pendingInquiries.textContent = (currentPending - 1).toString();
-                    completedToday.textContent = (currentCompleted + 1).toString();
-                    
-                    completedToday.style.animation = 'pulse 1s ease';
-                    setTimeout(() => {
-                        completedToday.style.animation = '';
-                    }, 1000);
-                }
-            }
-        }, 30000);
-    }
-    
-    // Start real-time updates simulation
-    simulateRealTimeUpdates();
+    // Real-time simulation removed — dashboard uses real data from the database
 });
 
 // Add CSS for animations

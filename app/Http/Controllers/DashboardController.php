@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Customer;
 use App\Models\AlertLog;
 use App\Models\CustomerInteraction;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Carbon\Carbon;
 
@@ -21,8 +22,10 @@ class DashboardController extends Controller
             'total_products' => Product::count(),
             'pending_inquiries' => \App\Models\Inquiry::where('status', 'new')->count(),
             'completed_today' => Sale::whereDate('created_at', $today)->count(),
-            'low_stock_count' => Product::where('Stock_Quantity', '<=', 10)->count(),
-            'overdue_invoices' => Sale::where('Status', 'Overdue')->count(),
+            'total_revenue' => Sale::where('Status', 'Completed')->sum('Total_Amount_PHP'),
+            'total_customers' => Customer::count(),
+            'low_stock_count' => \App\Models\Inventory::where('Current_Stock', '<=', DB::raw('COALESCE((SELECT Min_Stock_Level FROM products WHERE products.Product_ID = inventories.Product_ID), 10)'))->count(),
+            'overdue_invoices' => Sale::where('Due_Date', '<', $today)->whereIn('Status', ['Pending', 'Partial'])->count(),
             'active_quotations' => Quotation::whereIn('Status', ['Pending', 'Sent'])->count(),
         ];
         
