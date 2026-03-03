@@ -28,8 +28,10 @@ class FinanceController extends Controller
         try {
             $sales = $this->financeService->getAllSales();
             $paymentPlans = \App\Models\PaymentPlan::with(['sale.customer', 'installments'])->latest()->get();
-            $overdueSales = \App\Models\Sale::where('Status', 'Pending')
-                ->where('Sale_Date', '<', now()->subDays(30))
+            $overdueSales = \App\Models\Sale::where('Status', '!=', 'Completed')
+                ->whereNotNull('Due_Date')
+                ->where('Due_Date', '<', now()->toDateString())
+                ->with('customer')
                 ->get();
             $customers = \App\Models\Customer::orderBy('Institution_Name')->get();
 
@@ -204,6 +206,33 @@ class FinanceController extends Controller
             return response()->json(['success' => true, 'plan' => $plan]);
         } catch (Throwable $e) {
             return response()->json(['success' => false, 'message' => 'Plan not found'], 404);
+        }
+    }
+
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $sale = Sale::findOrFail($id);
+            
+            // Only allow deletion of unpaid invoices (no payments recorded)
+            if (($sale->Amount_Paid ?? 0) > 0) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Cannot delete an invoice with recorded payments. Void it instead.'
+                ], 422);
+            }
+
+            $sale->delete(); // Soft delete
+
+            $this->logger->logActivity('Invoice deleted', null, [
+                'sale_id' => $sale->Sale_ID,
+                'invoice_number' => $sale->Invoice_Number
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'Invoice deleted successfully.']);
+        } catch (Throwable $e) {
+            $this->logger->logError($e, 'Failed to delete invoice', ['sale_id' => $id]);
+            return response()->json(['success' => false, 'message' => 'Failed to delete invoice.'], 500);
         }
     }
 

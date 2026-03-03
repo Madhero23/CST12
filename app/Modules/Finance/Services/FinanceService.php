@@ -98,7 +98,7 @@ class FinanceService
         if ($newOutstanding <= 0) {
             $sale->Status = 'Completed';
         } elseif ($sale->Amount_Paid > 0) {
-            $sale->Status = 'Pending'; // Partial payment — stays Pending
+            $sale->Status = 'Partial';
         }
 
         $sale->save();

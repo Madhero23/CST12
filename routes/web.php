@@ -93,6 +93,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/finance/payment-plan/{id}', [FinanceController::class, 'getPaymentPlan'])->name('finance.payment-plan.get');
     Route::post('/finance/installment/{id}/pay', [FinanceController::class, 'payInstallment'])->name('finance.installment.pay');
     Route::post('/finance/sale/{id}/payment', [FinanceController::class, 'recordPayment'])->name('finance.payment');
+    Route::delete('/finance/sale/{id}', [FinanceController::class, 'destroy'])->name('finance.sale.delete');
 
     // Document Management
     Route::get('/documents', [DocumentController::class, 'index'])->name('documents');

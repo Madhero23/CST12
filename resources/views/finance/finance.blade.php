@@ -6,7 +6,7 @@
     <main class="admin-main-content">
         <!-- Page Header -->
         <div class="page-header">
-            <h1 class="page-title">Finance</h1>
+            <h1 class="page-title">Financial Management</h1>
         </div>
 
         <div class="admin-crm">
@@ -104,44 +104,61 @@
                             </div>
                             <div class="exchange-title-texts">
                                 <h3 class="main-title">Exchange Rate Monitor</h3>
-                                <p class="sub-title">USD to Local Currency</p>
+                                <p class="sub-title">USD to PHP Conversion</p>
                             </div>
                         </div>
                         <div class="auto-fetch-badge">Auto-Fetch: ON</div>
                     </div>
                     <div class="rate-info-grid">
+                        @php
+                            $latestRate = isset($sales) && $sales->count() > 0 
+                                ? $sales->whereNotNull('Exchange_Rate_At_Sale')->sortByDesc('Sale_Date')->first()?->Exchange_Rate_At_Sale 
+                                : null;
+                            $rateDisplay = $latestRate ? number_format($latestRate, 4) . ' PHP/USD' : 'Not set';
+                            $lastSaleDate = isset($sales) && $sales->count() > 0 ? $sales->sortByDesc('Sale_Date')->first()?->Sale_Date : null;
+                            $lastUpdated = $lastSaleDate ? \Carbon\Carbon::parse($lastSaleDate)->diffForHumans() : 'Never';
+                        @endphp
                         <div class="info-item">
                             <span class="label">Current Rate</span>
-                            <span class="value">1.35 LC/USD</span>
+                            <span class="value">{{ $rateDisplay }}</span>
                         </div>
                         <div class="info-item">
                             <span class="label">Last Updated</span>
-                            <span class="value">2 hours ago</span>
+                            <span class="value">{{ $lastUpdated }}</span>
                         </div>
                         <div class="info-item">
                             <span class="label">Update Source</span>
-                            <span class="value">Automated</span>
-                        </div>
-                    </div>
-                    <div class="threshold-alert">
-                        <div class="alert-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="12" y1="8" x2="12" y2="12"></line>
-                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                            </svg>
-                        </div>
-                        <div class="alert-text">
-                            Threshold Alert: Exchange rate has exceeded threshold (below 1.30). Dollar-denominated balances have been recalculated. Review pricing adjustments recommended.
+                            <span class="value">Manual</span>
                         </div>
                     </div>
                 </div>
                 
+                <div class="fin-controls">
+                    <div class="fin-search-container">
+                        <div class="fin-search-wrapper">
+                            <svg class="fin-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <input type="text" class="fin-search-input" placeholder="Search by customer or invoice #...">
+                        </div>
+                    </div>
+                    <div class="fin-filter-container">
+                        <select class="fin-status-filter">
+                            <option value="all">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="partial">Partial</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="sales-table-container">
                     <table class="finance-table">
                         <thead>
                             <tr>
-                                <th class="table-header">Invoice ID</th>
+                                <th class="table-header">Invoice #</th>
                                 <th class="table-header">Customer</th>
                                 <th class="table-header">Amount</th>
                                 <th class="table-header">Due Date</th>
@@ -151,9 +168,9 @@
                         </thead>
                         <tbody>
                             @forelse($sales as $index => $sale)
-                                <tr class="sale-row" data-sale-id="{{ $sale->Sale_ID }}">
+                                <tr class="sale-row" data-sale-id="{{ $sale->Sale_ID }}" data-status="{{ strtolower($sale->Status) }}">
                                     <td class="table-cell">
-                                        <div class="sale-id-text">#SL-{{ str_pad($sale->Sale_ID, 5, '0', STR_PAD_LEFT) }}</div>
+                                        <div class="sale-id-text">{{ $sale->Invoice_Number ?? '#SL-' . str_pad($sale->Sale_ID, 5, '0', STR_PAD_LEFT) }}</div>
                                     </td>
                                     <td class="table-cell">
                                         <div class="customer-name">{{ $sale->customer->Institution_Name ?? 'N/A' }}</div>
@@ -162,7 +179,7 @@
                                         <div class="amount-text">₱{{ number_format($sale->Total_Amount_PHP, 2) }}</div>
                                     </td>
                                     <td class="table-cell">
-                                        <div class="date-text">{{ \Carbon\Carbon::parse($sale->Sale_Date)->format('M d, Y') }}</div>
+                                        <div class="date-text">{{ $sale->Due_Date ? \Carbon\Carbon::parse($sale->Due_Date)->format('M d, Y') : 'N/A' }}</div>
                                     </td>
                                     <td class="table-cell">
                                         <span class="status-badge {{ strtolower($sale->Status) }}">
@@ -171,12 +188,25 @@
                                     </td>
                                     <td class="table-cell">
                                         <div class="table-actions">
+                                            <a href="#" class="fin-action-btn view-invoice-btn" data-sale-id="{{ $sale->Sale_ID }}" title="View Details">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                </svg>
+                                            </a>
                                             @if($sale->Status !== 'Completed' && $sale->Status !== 'Paid')
-                                            <a href="#" class="record-payment-link record-payment-btn" data-sale-id="{{ $sale->Sale_ID }}" data-sale-num="SL-{{ str_pad($sale->Sale_ID, 5, '0', STR_PAD_LEFT) }}" data-total="{{ $sale->Total_Amount_PHP }}" data-paid="{{ $sale->Amount_Paid ?? 0 }}">
-                                                Record Payment
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <a href="#" class="fin-action-btn record-payment-btn" data-sale-id="{{ $sale->Sale_ID }}" data-sale-num="{{ $sale->Invoice_Number ?? 'SL-' . str_pad($sale->Sale_ID, 5, '0', STR_PAD_LEFT) }}" data-total="{{ $sale->Total_Amount_PHP }}" data-paid="{{ $sale->Amount_Paid ?? 0 }}" title="Record Payment">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                     <circle cx="12" cy="12" r="10"></circle>
                                                     <polyline points="12 6 12 12 16 14"></polyline>
+                                                </svg>
+                                            </a>
+                                            @endif
+                                            @if(($sale->Amount_Paid ?? 0) == 0 && $sale->Status !== 'Completed')
+                                            <a href="#" class="fin-action-btn delete-invoice-btn" data-sale-id="{{ $sale->Sale_ID }}" data-invoice-num="{{ $sale->Invoice_Number ?? 'SL-' . str_pad($sale->Sale_ID, 5, '0', STR_PAD_LEFT) }}" title="Delete Invoice">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                                 </svg>
                                             </a>
                                             @endif
@@ -247,6 +277,128 @@ document.addEventListener('DOMContentLoaded', function() {
         requestAnimationFrame(() => toast.classList.add('show'));
         setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
     }
+
+    // ========== SEARCH & FILTER ==========
+    const searchInput = document.querySelector('.fin-search-input');
+    const statusFilter = document.querySelector('.fin-status-filter');
+
+    function applyFilters() {
+        const searchTerm = (searchInput?.value || '').toLowerCase();
+        const statusVal = statusFilter?.value || 'all';
+
+        document.querySelectorAll('.sale-row').forEach(row => {
+            const invoiceId = (row.querySelector('.sale-id-text')?.textContent || '').toLowerCase();
+            const customerName = (row.querySelector('.customer-name')?.textContent || '').toLowerCase();
+            const rowStatus = row.dataset.status || '';
+
+            const matchSearch = !searchTerm || invoiceId.includes(searchTerm) || customerName.includes(searchTerm);
+            const matchStatus = statusVal === 'all' || rowStatus === statusVal;
+
+            row.style.display = (matchSearch && matchStatus) ? '' : 'none';
+        });
+    }
+
+    searchInput?.addEventListener('input', applyFilters);
+    statusFilter?.addEventListener('change', applyFilters);
+
+    // ========== VIEW INVOICE MODAL ==========
+    document.querySelectorAll('.view-invoice-btn').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const saleId = this.dataset.saleId;
+            const row = this.closest('.sale-row');
+            const invoiceNum = row.querySelector('.sale-id-text')?.textContent || '';
+            const customerName = row.querySelector('.customer-name')?.textContent || 'N/A';
+            const amount = row.querySelector('.amount-text')?.textContent || '';
+            const dueDate = row.querySelector('.date-text')?.textContent || 'N/A';
+            const status = row.querySelector('.status-badge')?.textContent?.trim() || '';
+            const totalAmount = parseFloat(row.querySelector('.record-payment-btn')?.dataset.total || amount.replace(/[₱,]/g, '')) || 0;
+            const amountPaid = parseFloat(row.querySelector('.record-payment-btn')?.dataset.paid || 0);
+            const outstanding = totalAmount - amountPaid;
+
+            const body = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                    <div style="background: #f8fafc; padding: 16px; border-radius: 8px;">
+                        <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Invoice Number</div>
+                        <div style="font-weight: 700; color: #2f7a85; font-size: 16px;">${invoiceNum}</div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 16px; border-radius: 8px;">
+                        <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Customer</div>
+                        <div style="font-weight: 600;">${customerName}</div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 16px; border-radius: 8px;">
+                        <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Total Amount</div>
+                        <div style="font-weight: 700; font-size: 16px;">₱${totalAmount.toLocaleString('en-PH', {minimumFractionDigits: 2})}</div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 16px; border-radius: 8px;">
+                        <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Due Date</div>
+                        <div style="font-weight: 600;">${dueDate}</div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 16px; border-radius: 8px;">
+                        <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Status</div>
+                        <div style="font-weight: 600;">${status}</div>
+                    </div>
+                    <div style="background: #f8fafc; padding: 16px; border-radius: 8px;">
+                        <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Outstanding Balance</div>
+                        <div style="font-weight: 700; color: ${outstanding > 0 ? '#dc2626' : '#10b981'};">₱${outstanding.toLocaleString('en-PH', {minimumFractionDigits: 2})}</div>
+                    </div>
+                </div>
+                <div style="background: #f0f9fa; border-left: 4px solid #2f7a85; padding: 12px 16px; border-radius: 4px;">
+                    <p style="margin: 0; color: #1e4d53; font-size: 14px;">Amount Paid: <strong>₱${amountPaid.toLocaleString('en-PH', {minimumFractionDigits: 2})}</strong></p>
+                </div>
+            `;
+            createModal('Invoice Details — ' + invoiceNum, body, `<button class="fin-btn secondary fin-close-modal">Close</button>`);
+        });
+    });
+
+    // ========== DELETE INVOICE ==========
+    document.querySelectorAll('.delete-invoice-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const saleId = this.dataset.saleId;
+            const invoiceNum = this.dataset.invoiceNum;
+
+            const body = `
+                <div style="text-align: center; padding: 16px 0;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5" style="margin-bottom: 16px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                    <p style="font-size: 16px; color: #374151; margin-bottom: 8px;">Are you sure you want to delete invoice <strong>${invoiceNum}</strong>?</p>
+                    <p style="font-size: 13px; color: #6b7280;">This action can be undone (soft delete).</p>
+                </div>
+            `;
+            const modal = createModal('Delete Invoice', body, `
+                <button class="fin-btn secondary fin-close-modal">Cancel</button>
+                <button class="fin-btn primary" id="confirmDeleteInvoice" style="background: #ef4444;">Delete</button>
+            `);
+
+            modal.querySelector('#confirmDeleteInvoice').addEventListener('click', async function() {
+                this.disabled = true;
+                this.textContent = 'Deleting...';
+                try {
+                    const res = await fetch('/admin/finance/sale/' + saleId, {
+                        method: 'DELETE',
+                        headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+                    });
+                    const json = await res.json();
+                    if (json.success) {
+                        showToast('Invoice deleted successfully!', 'success');
+                        closeModal(modal);
+                        setTimeout(() => window.location.reload(), 500);
+                    } else {
+                        showToast(json.message || 'Failed to delete invoice', 'error');
+                    }
+                } catch (err) {
+                    showToast('Network error. Please try again.', 'error');
+                } finally {
+                    this.disabled = false;
+                    this.textContent = 'Delete';
+                }
+            });
+        });
+    });
 
     // Customer options
     const customerOptions = `
@@ -735,7 +887,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => { card.style.opacity = '1'; card.style.transform = 'translateY(0) scale(1)'; }, i * 150);
     });
 
-    document.querySelectorAll('.invoice-row').forEach((row, i) => {
+    document.querySelectorAll('.sale-row').forEach((row, i) => {
         row.style.opacity = '0';
         row.style.transform = 'translateY(10px)';
         row.style.transition = 'all 0.3s ease';

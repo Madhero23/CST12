@@ -274,6 +274,124 @@
     line-height: 1.4;
 }
 
+/* Search & Filter Controls */
+.fin-controls {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-top: 24px;
+}
+
+.fin-search-container {
+    flex: 1;
+}
+
+.fin-search-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.fin-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+.fin-search-input {
+    width: 100%;
+    padding: 10px 12px 10px 38px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    background: #fff;
+}
+
+.fin-search-input:focus {
+    outline: none;
+    border-color: #2f7a85;
+    box-shadow: 0 0 0 3px rgba(47, 122, 133, 0.1);
+}
+
+.fin-filter-container {
+    flex-shrink: 0;
+}
+
+.fin-status-filter {
+    padding: 10px 32px 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fff;
+    cursor: pointer;
+    appearance: auto;
+    transition: border-color 0.2s;
+}
+
+.fin-status-filter:focus {
+    outline: none;
+    border-color: #2f7a85;
+    box-shadow: 0 0 0 3px rgba(47, 122, 133, 0.1);
+}
+
+/* Action Icon Buttons */
+.table-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.fin-action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.fin-action-btn.view-invoice-btn {
+    color: #2f7a85;
+    background: #e0f2f1;
+}
+
+.fin-action-btn.view-invoice-btn:hover {
+    background: #b2dfdb;
+    color: #235c63;
+}
+
+.fin-action-btn.record-payment-btn {
+    color: #f59e0b;
+    background: #fef3c7;
+}
+
+.fin-action-btn.record-payment-btn:hover {
+    background: #fde68a;
+    color: #d97706;
+}
+
+.fin-action-btn.delete-invoice-btn {
+    color: #ef4444;
+    background: #fee2e2;
+}
+
+.fin-action-btn.delete-invoice-btn:hover {
+    background: #fecaca;
+    color: #dc2626;
+}
+
+/* Partial status badge */
+.status-badge.partial {
+    background: #e0f2fe;
+    color: #075985;
+}
+
 /* Invoices Table */
 .sales-table-container {
     margin-top: 24px;
