@@ -10,7 +10,7 @@
     <main class="admin-main-content">
         <div class="admin-documents">
             <div class="page-header">
-                <h1 class="page-title">Documents</h1>
+                <h1 class="page-title">Document Management</h1>
             </div>
         
         <div class="doc-main-card" data-animate="fade-in">
@@ -63,6 +63,25 @@
                 </div>
             </div>
             
+            <div class="doc-controls">
+                <div class="doc-search-wrapper">
+                    <svg class="doc-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" class="doc-search-input" placeholder="Search by quotation # or customer...">
+                </div>
+                <select class="doc-status-filter">
+                    <option value="all">All Status</option>
+                    <option value="draft">Draft</option>
+                    <option value="sent">Sent</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="won">Won</option>
+                    <option value="lost">Lost</option>
+                </select>
+            </div>
+
             <div class="doc-table">
                 <div class="table-head">
                     <div class="th">Quotation ID</div>
@@ -77,12 +96,12 @@
                 <div class="table-body">
                     @forelse($quotations as $row)
                     @php
-                        $firstProduct = $row->lineItems->first()->product->Product_Name ?? 'Multiple Products';
+                        $firstProduct = $row->lineItems->first()?->product?->Product_Name ?? 'No Product';
                         if ($row->lineItems->count() > 1) {
-                            $firstProduct = $row->lineItems->first()->product->Product_Name . ' ...';
+                            $firstProduct = ($row->lineItems->first()?->product?->Product_Name ?? 'No Product') . ' ...';
                         }
                     @endphp
-                    <div class="table-row">
+                    <div class="table-row" data-status="{{ strtolower($row->Status) }}">
                         <div class="td quote-id">{{ $row->Quotation_Number }}</div>
                         <div class="td">{{ $row->customer->Institution_Name ?? 'N/A' }}</div>
                         <div class="td" style="color: #64748b;">{{ $firstProduct }}</div>
@@ -95,10 +114,13 @@
                         </div>
                         <div class="td">
                             <div class="action-links">
+                                <svg class="icon-action view-quote-btn" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-quote-id="{{ $row->Quotation_ID }}" title="View Details"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                @if(!in_array($row->Status, ['Won', 'Lost']))
                                 <span class="action-link" onclick="openReviseModal({{ $row->Quotation_ID }})">Revise</span>
+                                @endif
                                 <span class="action-link" onclick="openStatusModal({{ $row->Quotation_ID }}, '{{ $row->Status }}')">Status</span>
-                                <svg class="icon-action" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" onclick="window.location.href='{{ route('admin.documents.download', $row->Quotation_ID) }}'"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                <svg class="icon-action" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" onclick="openVersionHistoryModal({{ $row->Quotation_ID }})"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+                                <svg class="icon-action" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" onclick="window.location.href='{{ route('admin.documents.download', $row->Quotation_ID) }}'" title="Download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                <svg class="icon-action" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" onclick="openVersionHistoryModal({{ $row->Quotation_ID }})" title="History"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
                             </div>
                         </div>
                     </div>
@@ -118,17 +140,20 @@
                 </div>
                 <div class="file-list">
                     @forelse($documents as $doc)
-                    <div class="file-item">
+                    <div class="file-item" data-doc-id="{{ $doc->Document_ID }}">
                         <div class="file-info">
                             <div class="file-icon-box">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14.5 2 14.5 8 20 8"></polyline></svg>
                             </div>
                             <div class="file-details">
                                 <div class="file-name">{{ $doc->File_Name }}</div>
-                                <div class="file-meta">{{ $doc->Document_Type }} • {{ round($doc->File_Size / 1024 / 1024, 1) }} MB</div>
+                                <div class="file-meta">{{ $doc->Document_Type }} • {{ round($doc->File_Size / 1024 / 1024, 1) }} MB{{ $doc->Related_Entity_Type ? ' • Linked to: ' . $doc->Related_Entity_Type : '' }}</div>
                             </div>
                         </div>
-                        <svg class="icon-action" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" onclick="window.location.href='{{ route('admin.documents.download', $doc->Document_ID) }}'"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <div class="file-actions">
+                            <svg class="icon-action" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" onclick="window.location.href='{{ route('admin.documents.download', $doc->Document_ID) }}'" title="Download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <svg class="icon-action doc-delete-btn" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-doc-id="{{ $doc->Document_ID }}" data-doc-name="{{ $doc->File_Name }}" title="Delete"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </div>
                     </div>
                     @empty
                     <p style="color: var(--fin-gray); text-align: center; padding: 1rem;">No files uploaded.</p>
@@ -142,22 +167,17 @@
                     <button class="plus-btn" onclick="openTemplatesModal()">+</button>
                 </div>
                 <div class="template-list">
-                    @php
-                        $mockTemplates = [
-                            ['name' => 'Standard Hospital Quotation', 'meta' => 'Hospital • Used 24 times'],
-                            ['name' => 'Diagnostic Center Packet', 'meta' => 'Clinic • Used 12 times'],
-                            ['name' => 'Govt Tender Template', 'meta' => 'Government • Used 8 times']
-                        ];
-                    @endphp
-                    @foreach($mockTemplates as $tpl)
-                    <div class="template-item">
+                    @forelse($templates as $tpl)
+                    <div class="template-item" onclick="openTemplatesModal({{ $tpl->Template_ID }})" style="cursor: pointer;">
                         <div class="template-info">
-                            <div class="template-name">{{ $tpl['name'] }}</div>
-                            <div class="template-meta">{{ $tpl['meta'] }}</div>
+                            <div class="template-name">{{ $tpl->Template_Name }}</div>
+                            <div class="template-meta">{{ $tpl->Template_Type }}</div>
                         </div>
-                        <svg class="icon-action" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.3;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        <svg class="icon-action" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                     </div>
-                    @endforeach
+                    @empty
+                    <p style="color: var(--fin-gray); text-align: center; padding: 1rem; font-size: 0.85rem;">No templates yet. Click + to create one.</p>
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -893,4 +913,112 @@
             showToast('Delete failed', 'error');
         }
     }
+    // ── Search & Filter ──
+    const searchInput = document.querySelector('.doc-search-input');
+    const statusFilter = document.querySelector('.doc-status-filter');
+
+    function filterQuotations() {
+        const query = (searchInput?.value || '').toLowerCase();
+        const status = statusFilter?.value || 'all';
+        document.querySelectorAll('.table-body .table-row').forEach(row => {
+            const text = row.textContent.toLowerCase();
+            const rowStatus = row.getAttribute('data-status') || '';
+            const matchesSearch = !query || text.includes(query);
+            const matchesStatus = status === 'all' || rowStatus === status;
+            row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+        });
+    }
+
+    searchInput?.addEventListener('input', filterQuotations);
+    statusFilter?.addEventListener('change', filterQuotations);
+
+    // ── View Quotation Detail Modal ──
+    document.querySelectorAll('.view-quote-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-quote-id');
+            const quotations = @json($quotations);
+            const quote = quotations.find(q => q.Quotation_ID == id);
+            if (!quote) return;
+
+            const customer = quote.customer?.Institution_Name || 'N/A';
+            const amount = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(quote.Total_Amount_PHP);
+            const created = new Date(quote.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const expires = quote.Expiration_Date ? new Date(quote.Expiration_Date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A';
+
+            let itemsHtml = '<div style="margin-top: 0.5rem;">';
+            if (quote.line_items && quote.line_items.length > 0) {
+                quote.line_items.forEach((item, i) => {
+                    const productName = item.product?.Product_Name || 'Unknown Product';
+                    const lineTotal = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(item.Line_Total || (item.Unit_Price * item.Quantity));
+                    itemsHtml += `<div style="padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between;">
+                        <span>${i + 1}. ${productName} × ${item.Quantity}</span>
+                        <span style="font-weight: 600;">${lineTotal}</span>
+                    </div>`;
+                });
+            } else {
+                itemsHtml += '<p style="color: #94a3b8; font-size: 0.85rem;">No line items</p>';
+            }
+            itemsHtml += '</div>';
+
+            const body = `
+                <div class="high-fidelity-form" style="gap: 0.75rem;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                        <div class="form-group"><label>Quotation #</label><div style="font-weight: 600; color: var(--fin-teal);">${quote.Quotation_Number}</div></div>
+                        <div class="form-group"><label>Status</label><div><span class="status-pill status-${quote.Status.toLowerCase()}">${quote.Status}</span></div></div>
+                        <div class="form-group"><label>Customer</label><div style="font-weight: 500;">${customer}</div></div>
+                        <div class="form-group"><label>Version</label><div>v${quote.Version_Number}</div></div>
+                        <div class="form-group"><label>Created</label><div>${created}</div></div>
+                        <div class="form-group"><label>Expires</label><div>${expires}</div></div>
+                    </div>
+                    <div class="form-group"><label>Total Amount</label><div style="font-size: 1.25rem; font-weight: 700; color: var(--fin-teal);">${amount}</div></div>
+                    <div class="form-group"><label>Line Items</label>${itemsHtml}</div>
+                    ${quote.Additional_Notes ? `<div class="form-group"><label>Notes</label><div style="font-size: 0.85rem; color: #64748b;">${quote.Additional_Notes}</div></div>` : ''}
+                </div>
+            `;
+            const footer = `<button class="btn btn-primary btn-solid-teal close-modal">Close</button>`;
+            createModal('Quotation Details', body, footer);
+        });
+    });
+
+    // ── Delete Supporting Document ──
+    document.querySelectorAll('.doc-delete-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const id = this.getAttribute('data-doc-id');
+            const name = this.getAttribute('data-doc-name');
+
+            const body = `<p style="color: var(--fin-slate); font-size: 0.95rem;">Are you sure you want to delete <strong>${name}</strong>?</p>
+                <div class="modal-notice"><p>This action will permanently remove the document. This cannot be undone.</p></div>`;
+            const footer = `
+                <button class="btn btn-outline close-modal">Cancel</button>
+                <button class="btn btn-solid-teal" style="background: #ef4444 !important;" onclick="confirmDeleteDoc(this, ${id})">Delete Document</button>
+            `;
+            createModal('Delete Document', body, footer);
+        });
+    });
+
+    async function confirmDeleteDoc(btn, id) {
+        btn.disabled = true;
+        btn.innerText = 'Deleting...';
+        try {
+            const response = await fetch(`/admin/documents/${id}`, {
+                method: 'DELETE',
+                headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+            });
+            const result = await response.json();
+            if (result.success) {
+                showToast('Document deleted successfully');
+                const item = document.querySelector(`.file-item[data-doc-id="${id}"]`);
+                if (item) { item.style.transition = 'opacity 0.3s'; item.style.opacity = '0'; setTimeout(() => item.remove(), 300); }
+                closeModal(btn.closest('.modal-overlay'));
+            } else {
+                showToast(result.message || 'Delete failed', 'error');
+                btn.disabled = false; btn.innerText = 'Delete Document';
+            }
+        } catch (error) {
+            showToast('Delete failed', 'error');
+            btn.disabled = false; btn.innerText = 'Delete Document';
+        }
+    }
+
 </script>

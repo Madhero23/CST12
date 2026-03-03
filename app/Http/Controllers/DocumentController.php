@@ -37,12 +37,15 @@ class DocumentController extends Controller
             // Calculate stats for the grid
             $stats = [
                 'active' => $quotations->whereIn('Status', ['Pending', 'Sent', 'Draft'])->count(),
-                'templates' => 3, // Placeholder matching reference image
+                'templates' => 0, // Will update after templates query
                 'certificates' => $documents->where('Document_Type', 'Certificate')->count(),
-                'avgDays' => 8.4 // Placeholder matching reference image
+                'avgDays' => round($quotations->whereIn('Status', ['Pending', 'Sent', 'Draft'])->avg(function ($q) {
+                    return now()->diffInDays($q->created_at);
+                }) ?? 0, 1),
             ];
             
             $templates = \App\Models\QuotationTemplate::where('Is_Active', true)->get();
+            $stats['templates'] = $templates->count();
             $sales = \App\Models\Sale::with(['customer'])->latest()->get();
             
             return view('document.document', compact('documents', 'customers', 'quotations', 'products', 'stats', 'templates', 'sales'));
