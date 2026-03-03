@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us | RozMed Medical Equipment & Supplies</title>
+    <meta name="description" content="Contact RozMed Enterprise for medical equipment inquiries, support, or partnership opportunities. Located in Davao City.">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -149,7 +151,7 @@
                                             </div>
                                             <div class="contact-details">
                                                 <p class="contact-label">Email</p>
-                                                <a href="mailto:support@rozmed.com" class="contact-value">support@rozmed.com</a>
+                                                <a href="mailto:info@rozmed.com" class="contact-value">info@rozmed.com</a>
                                             </div>
                                         </div>
                                         
@@ -170,7 +172,7 @@
                                             <div class="contact-details">
                                                 <p class="contact-label">Address</p>
                                                 <p class="contact-value address">
-                                                    2450 Medical Center Drive, Suite 300, San Francisco, CA 94158
+                                                    2500 Healthcare Avenue, Suite 400, Davao City
                                                 </p>
                                             </div>
                                         </div>
@@ -215,7 +217,6 @@
 </body>
 </html>
 
-@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Contact form submission
@@ -613,4 +614,3 @@ contactStyles.textContent = `
 `;
 document.head.appendChild(contactStyles);
 </script>
-@endpush

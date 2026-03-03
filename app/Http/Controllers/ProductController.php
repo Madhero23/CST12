@@ -53,6 +53,9 @@ class ProductController extends Controller
         try {
             // Get product from service
             $product = $this->productService->getProductById($id);
+            
+            // Load total stock from inventories for accurate stock display
+            $product->total_stock = $product->inventories()->sum('Current_Stock');
 
             return view('components.viewproduct', compact('product'));
 

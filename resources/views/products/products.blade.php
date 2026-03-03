@@ -87,7 +87,7 @@
                         @forelse($products as $product)
                         <div class="product-card" 
                              data-category="{{ $product->Category }}"
-                             data-stock="{{ $product->total_stock > 0 ? 'in-stock' : 'out-of-stock' }}">
+                             data-stock="@if($product->total_stock > 0 && $product->total_stock <= $product->Min_Stock_Level)low-stock @elseif($product->total_stock > 0)in-stock @else out-of-stock @endif">
                             <div class="product-image-container">
                                 @if($product->Images_Path)
                                     <img src="{{ asset('storage/' . $product->Images_Path) }}" 
@@ -169,7 +169,6 @@
 </body>
 </html>
 
-@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
@@ -227,4 +226,3 @@ document.addEventListener('DOMContentLoaded', function() {
     statusFilter.addEventListener('change', filterProducts);
 });
 </script>
-@endpush

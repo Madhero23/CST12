@@ -47,10 +47,12 @@
                                          class="product-main-image">
                                 @endif
                                 
+                                @if($product->FDA_Certification_Status == 'Certified')
                                 <div class="product-certified-badge">
                                     <i class="far fa-check-circle certified-icon"></i>
                                     <span class="certified-text">Certified</span>
                                 </div>
+                                @endif
                             </div>
                         </div>
 
@@ -75,10 +77,17 @@
                             <h1 class="product-title">{{ $product->Product_Name }}</h1>
                             
                             <div class="product-status-wrap">
-                                <span class="product-status-badge @if($product->Min_Stock_Level > 0) in-stock @else out-of-stock @endif">
-                                    <i class="fas @if($product->Min_Stock_Level > 0) fa-check-circle @else fa-times-circle @endif status-icon"></i>
+                                @php
+                                    $stockVal = $product->total_stock ?? 0;
+                                    $isInStock = $stockVal > 0;
+                                    $isLowStock = $isInStock && $stockVal <= ($product->Min_Stock_Level ?? 0);
+                                @endphp
+                                <span class="product-status-badge @if($isLowStock) low-stock @elseif($isInStock) in-stock @else out-of-stock @endif">
+                                    <i class="fas @if($isInStock) fa-check-circle @else fa-times-circle @endif status-icon"></i>
                                     <span class="status-text">
-                                        @if($product->Min_Stock_Level > 0)
+                                        @if($isLowStock)
+                                            Low Stock ({{ $stockVal }} left)
+                                        @elseif($isInStock)
                                             In Stock
                                         @else
                                             Out of Stock
@@ -93,12 +102,7 @@
                                     <span class="product-price">₱{{ number_format($product->Unit_Price_PHP, 2) }}</span>
                                     <span class="price-usd">(${{ number_format($product->Unit_Price_USD, 2) }} USD)</span>
                                 </div>
-                                @if($product->Reorder_Quantity)
-                                <div class="reorder-info">
-                                    <span class="reorder-label">Reorder Quantity:</span>
-                                    <span class="reorder-value">{{ $product->Reorder_Quantity }} units</span>
-                                </div>
-                                @endif
+
                             </div>
                             
                             <p class="product-description">
@@ -166,12 +170,16 @@
                                     </div>
                                     
                                     <div class="form-group">
+                                        <input type="tel" name="phone" placeholder="Your Phone Number" class="form-input" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
                                         <textarea name="message" placeholder="Your Message" class="form-textarea" rows="4" required></textarea>
                                     </div>
                                     
                                     <button type="submit" class="submit-btn">
                                         <i class="fas fa-paper-plane"></i>
-                                        <span>Submit Inquiry</span>
+                                        <span class="submit-text">Submit Inquiry</span>
                                     </button>
                                 </form>
                             </div>
@@ -187,7 +195,7 @@
                         <img src="{{ asset('error-icon.svg') }}" alt="Not Found" class="not-found-icon">
                         <h2>Product Not Found</h2>
                         <p>The product you're looking for doesn't exist or has been removed.</p>
-                        <a href="{{ route('product') }}" class="back-to-products-btn">
+                        <a href="{{ route('products.index') }}" class="back-to-products-btn">
                             Back to Products
                         </a>
                     </div>
