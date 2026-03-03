@@ -5,7 +5,7 @@
     <main class="admin-main-content">
         <!-- Page Header -->
         <div class="page-header">
-            <h1 class="page-title">CM</h1>
+            <h1 class="page-title">Customer Management</h1>
         </div>
 
         <div class="admin-crm">
@@ -69,6 +69,34 @@
                     </div>
                 </div>
                 
+                <!-- Search & Filters -->
+                <div class="crm-controls">
+                    <div class="crm-search-container">
+                        <div class="crm-search-wrapper">
+                            <svg class="crm-search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            <input type="text" class="crm-search-input" placeholder="Search by name or email...">
+                        </div>
+                    </div>
+                    <div class="crm-filter-container">
+                        <select class="crm-status-filter">
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="onhold">On Hold</option>
+                        </select>
+                    </div>
+                    <div class="crm-filter-container">
+                        <select class="crm-type-filter">
+                            <option value="all">All Types</option>
+                            <option value="hospital">Hospital</option>
+                            <option value="privateclinic">Private Clinic</option>
+                            <option value="school">School</option>
+                            <option value="government">Government</option>
+                            <option value="otherinstitution">Other</option>
+                        </select>
+                    </div>
+                </div>
+
                 <!-- Customer Table -->
                 <div class="customer-table-container">
                     <table class="customer-table">
@@ -76,6 +104,8 @@
                             <tr>
                                 <th class="table-header">Name</th>
                                 <th class="table-header">Email</th>
+                                <th class="table-header">Phone</th>
+                                <th class="table-header">Type</th>
                                 <th class="table-header">Status</th>
                                 <th class="table-header">Last Interaction</th>
                                 <th class="table-header">Actions</th>
@@ -83,7 +113,12 @@
                         </thead>
                         <tbody>
                             @forelse($customers as $index => $customer)
-                            <tr class="customer-row" data-animation-delay="{{ $index * 0.1 }}" data-customer-id="{{ $customer->Customer_ID }}" data-json="{{ json_encode($customer) }}">
+                            <tr class="customer-row" 
+                                data-animation-delay="{{ $index * 0.1 }}" 
+                                data-customer-id="{{ $customer->Customer_ID }}" 
+                                data-json="{{ json_encode($customer) }}"
+                                data-status="{{ strtolower($customer->Status ?? 'active') }}"
+                                data-type="{{ strtolower($customer->Customer_Type ?? '') }}">
                                 <td class="customer-cell">
                                     <div class="customer-name">{{ $customer->Institution_Name ?? $customer->Contact_Person ?? 'N/A' }}</div>
                                 </td>
@@ -91,12 +126,18 @@
                                     <div class="customer-email">{{ $customer->Email ?? 'N/A' }}</div>
                                 </td>
                                 <td class="customer-cell">
+                                    <div class="customer-phone">{{ $customer->Phone ?? 'N/A' }}</div>
+                                </td>
+                                <td class="customer-cell">
+                                    <span class="type-badge">{{ str_replace(['PrivateClinic', 'OtherInstitution'], ['Private Clinic', 'Other'], $customer->Customer_Type ?? 'N/A') }}</span>
+                                </td>
+                                <td class="customer-cell">
                                     <span class="status-badge {{ strtolower($customer->Status ?? 'active') }}">
                                         {{ $customer->Status ?? 'Active' }}
                                     </span>
                                 </td>
                                 <td class="customer-cell">
-                                    <div class="last-interaction">{{ $customer->updated_at ? $customer->updated_at->diffForHumans() : 'N/A' }}</div>
+                                    <div class="last-interaction">{{ $customer->Last_Interaction_Date ? $customer->Last_Interaction_Date->diffForHumans() : 'Never' }}</div>
                                 </td>
                                 <td class="customer-cell">
                                     <div class="customer-actions">
@@ -115,12 +156,19 @@
                                             </svg>
                                             <span>Logs</span>
                                         </button>
+                                        <button class="icon-btn delete-btn" title="Delete Customer" data-customer-id="{{ $customer->Customer_ID }}" data-customer-name="{{ $customer->Institution_Name ?? 'this customer' }}">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            </svg>
+                                            <span>Delete</span>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="customer-cell" style="text-align: center; padding: 2rem;">
+                                <td colspan="7" class="customer-cell" style="text-align: center; padding: 2rem;">
                                     No customers found. Click "Add Customer" to create one.
                                 </td>
                             </tr>
@@ -195,6 +243,85 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => toast.remove(), 300);
         }, 3000);
     }
+
+    // ========== SEARCH & FILTER ==========
+    const searchInput = document.querySelector('.crm-search-input');
+    const statusFilter = document.querySelector('.crm-status-filter');
+    const typeFilter = document.querySelector('.crm-type-filter');
+
+    function applyFilters() {
+        const searchTerm = (searchInput?.value || '').toLowerCase();
+        const statusVal = statusFilter?.value || 'all';
+        const typeVal = typeFilter?.value || 'all';
+
+        document.querySelectorAll('.customer-row').forEach(row => {
+            const name = (row.querySelector('.customer-name')?.textContent || '').toLowerCase();
+            const email = (row.querySelector('.customer-email')?.textContent || '').toLowerCase();
+            const rowStatus = row.dataset.status || '';
+            const rowType = row.dataset.type || '';
+
+            const matchSearch = !searchTerm || name.includes(searchTerm) || email.includes(searchTerm);
+            const matchStatus = statusVal === 'all' || rowStatus === statusVal;
+            const matchType = typeVal === 'all' || rowType === typeVal;
+
+            row.style.display = (matchSearch && matchStatus && matchType) ? '' : 'none';
+        });
+    }
+
+    searchInput?.addEventListener('input', applyFilters);
+    statusFilter?.addEventListener('change', applyFilters);
+    typeFilter?.addEventListener('change', applyFilters);
+
+    // ========== DELETE CUSTOMER ==========
+    document.addEventListener('click', async function(e) {
+        const deleteBtn = e.target.closest('.delete-btn');
+        if (!deleteBtn) return;
+        e.preventDefault();
+
+        const customerId = deleteBtn.dataset.customerId;
+        const customerName = deleteBtn.dataset.customerName;
+
+        const confirmBody = `
+            <div style="text-align: center; padding: 16px 0;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5" style="margin-bottom: 16px;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+                <p style="font-size: 16px; color: #374151; margin-bottom: 8px;">Are you sure you want to delete <strong>${customerName}</strong>?</p>
+                <p style="font-size: 13px; color: #6b7280;">This action can be undone (soft delete).</p>
+            </div>
+        `;
+
+        const modal = createModal('Delete Customer', confirmBody, `
+            <button class="modal-btn secondary close-modal">Cancel</button>
+            <button class="modal-btn primary" id="confirmDeleteBtn" style="background: #ef4444;">Delete</button>
+        `);
+
+        modal.querySelector('#confirmDeleteBtn').addEventListener('click', async function() {
+            this.disabled = true;
+            this.textContent = 'Deleting...';
+            try {
+                const res = await fetch('/admin/customers/' + customerId, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+                });
+                const json = await res.json();
+                if (json.success) {
+                    showToast('Customer deleted successfully!', 'success');
+                    closeModal(modal);
+                    setTimeout(() => window.location.reload(), 500);
+                } else {
+                    showToast(json.message || 'Failed to delete customer', 'error');
+                }
+            } catch (err) {
+                showToast('Network error. Please try again.', 'error');
+            } finally {
+                this.disabled = false;
+                this.textContent = 'Delete';
+            }
+        });
+    });
 
     // ========== VIEW CUSTOMER MODAL ==========
     document.querySelectorAll('.view-btn').forEach(btn => {
@@ -717,19 +844,31 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ========== CREATE QUOTE MODAL ==========
+    const allCustomers = @json($customers ?? []);
     window.openCreateQuoteModal = function(customerId, customerName) {
-        console.log('Opening Quote Modal for:', customerName);
+        console.log('Opening Quote Modal for:', customerName || 'New');
         
         let rowCount = 0;
         
+        // If no customer pre-selected, show customer dropdown
+        const customerSelector = !customerId ? `
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="form-label">Customer <span class="required">*</span></label>
+                    <select name="customer_id" class="form-input" required id="quoteCustomerSelect">
+                        <option value="">Select Customer...</option>
+                        ${allCustomers.map(c => `<option value="${c.Customer_ID}">${c.Institution_Name}</option>`).join('')}
+                    </select>
+                </div>
+        ` : `<input type="hidden" name="customer_id" value="${customerId}">`;
+        
         const body = `
             <form id="createQuoteForm" class="modal-form">
-                <input type="hidden" name="customer_id" value="${customerId}">
+                ${customerSelector}
                 
                 <div class="form-row" style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; margin-bottom: 20px;">
                     <div class="form-group">
                         <label class="form-label">Quote Title <span class="required">*</span></label>
-                        <input type="text" name="title" class="form-input" required placeholder="e.g. Q4 Equipment Upgrade" value="Quote for ${customerName}">
+                        <input type="text" name="title" class="form-input" required placeholder="e.g. Q4 Equipment Upgrade" value="${customerName ? 'Quote for ' + customerName : ''}">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Valid Until <span class="required">*</span></label>
@@ -751,9 +890,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         <thead>
                             <tr style="border-bottom: 1px solid #d1d5db; text-align: left;">
                                 <th style="padding: 8px; width: 40%; font-size: 13px; color: #6b7280;">Product</th>
-                                <th style="padding: 8px; width: 15%; font-size: 13px; color: #6b7280;">Price ($)</th>
+                                <th style="padding: 8px; width: 15%; font-size: 13px; color: #6b7280;">Price (₱)</th>
                                 <th style="padding: 8px; width: 15%; font-size: 13px; color: #6b7280;">Qty</th>
-                                <th style="padding: 8px; width: 20%; font-size: 13px; color: #6b7280;">Total ($)</th>
+                                <th style="padding: 8px; width: 20%; font-size: 13px; color: #6b7280;">Total (₱)</th>
                                 <th style="padding: 8px; width: 10%;"></th>
                             </tr>
                         </thead>
@@ -766,9 +905,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 <div class="quote-summary" style="display: flex; justify-content: flex-end;">
                     <div style="width: 250px; text-align: right;">
-                        <div style="margin-bottom: 8px; font-size: 14px; color: #6b7280;">Subtotal: <span id="quoteSubtotal" style="color: #1f2937; font-weight: 600;">$0.00</span></div>
-                        <div style="margin-bottom: 8px; font-size: 14px; color: #6b7280;">VAT (12%): <span id="quoteTax" style="color: #1f2937; font-weight: 600;">$0.00</span></div>
-                        <div style="font-size: 18px; color: #235c63; font-weight: 700; border-top: 1px solid #e5e7eb; padding-top: 8px;">Total: <span id="quoteTotal">$0.00</span></div>
+                        <div style="margin-bottom: 8px; font-size: 14px; color: #6b7280;">Subtotal: <span id="quoteSubtotal" style="color: #1f2937; font-weight: 600;">₱0.00</span></div>
+                        <div style="margin-bottom: 8px; font-size: 14px; color: #6b7280;">VAT (12%): <span id="quoteTax" style="color: #1f2937; font-weight: 600;">₱0.00</span></div>
+                        <div style="font-size: 18px; color: #235c63; font-weight: 700; border-top: 1px solid #e5e7eb; padding-top: 8px;">Total: <span id="quoteTotal">₱0.00</span></div>
                         <input type="hidden" name="total_amount" id="totalAmountInput" value="0">
                     </div>
                 </div>
@@ -802,7 +941,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td style="padding: 8px;">
                     <select class="form-input product-select" name="items[${rowCount}][product_id]" required>
                         <option value="">Select Product...</option>
-                        ${products.map(p => `<option value="${p.Product_ID}" data-price="${p.Unit_Price_USD}">${p.Product_Name}</option>`).join('')}
+                        ${products.map(p => `<option value="${p.Product_ID}" data-price="${p.Unit_Price_PHP || p.Unit_Price_USD}">${p.Product_Name}</option>`).join('')}
                     </select>
                 </td>
                 <td style="padding: 8px;">
@@ -812,7 +951,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <input type="number" class="form-input qty-input" name="items[${rowCount}][quantity]" value="1" min="1" required>
                 </td>
                 <td style="padding: 8px; font-weight: 600; color: #374151;">
-                    <span class="row-total">$0.00</span>
+                    <span class="row-total">₱0.00</span>
                 </td>
                 <td style="padding: 8px; text-align: center;">
                     <button type="button" class="remove-row-btn" style="background: none; border: none; color: #ef4444; cursor: pointer;">&times;</button>
@@ -846,16 +985,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 const price = parseFloat(row.querySelector('.price-input').value) || 0;
                 const qty = parseInt(row.querySelector('.qty-input').value) || 0;
                 const total = price * qty;
-                row.querySelector('.row-total').textContent = '$' + total.toFixed(2);
+                row.querySelector('.row-total').textContent = '₱' + total.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                 subtotal += total;
             });
 
             const tax = subtotal * 0.12;
             const total = subtotal + tax;
 
-            modal.querySelector('#quoteSubtotal').textContent = '$' + subtotal.toFixed(2);
-            modal.querySelector('#quoteTax').textContent = '$' + tax.toFixed(2);
-            modal.querySelector('#quoteTotal').textContent = '$' + total.toFixed(2);
+            modal.querySelector('#quoteSubtotal').textContent = '₱' + subtotal.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            modal.querySelector('#quoteTax').textContent = '₱' + tax.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            modal.querySelector('#quoteTotal').textContent = '₱' + total.toLocaleString('en-PH', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             modal.querySelector('#totalAmountInput').value = subtotal.toFixed(2);
         }
 
@@ -1037,7 +1176,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                     <div class="form-group">
                         <label class="form-label">Institution Name <span class="required">*</span></label>
-                        <input type="text" id="cust-company" class="form-input" placeholder="e.g. Manila General Hospital">
+                        <input type="text" id="cust-company" class="form-input" placeholder="e.g. Manila General Hospital" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Contact Person</label>
@@ -1048,7 +1187,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                     <div class="form-group">
                         <label class="form-label">Email <span class="required">*</span></label>
-                        <input type="email" id="cust-email" class="form-input" placeholder="email@institution.com">
+                        <input type="email" id="cust-email" class="form-input" placeholder="email@institution.com" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Phone</label>
@@ -1059,7 +1198,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                     <div class="form-group">
                         <label class="form-label">Type <span class="required">*</span></label>
-                        <select id="cust-type" class="form-input">
+                        <select id="cust-type" class="form-input" required>
                             <option value="PrivateClinic">Private Clinic</option>
                             <option value="Hospital">Hospital</option>
                             <option value="School">School</option>
@@ -1174,191 +1313,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // ========== CREATE QUOTE MODAL ==========
-    async function fetchProducts() {
-        try {
-            const res = await fetch('/products/search?q='); // Fetch all or search
-            const json = await res.json();
-            return json.success ? json.products : [];
-        } catch (e) {
-            console.error('QUOTE: Fetch products failed', e);
-            return [];
-        }
-    }
-
-    document.addEventListener('click', async function(e) {
+    // ========== HEADER CREATE QUOTE BUTTON ==========
+    // Wire header "Create Quote" button to use unified openCreateQuoteModal
+    document.addEventListener('click', function(e) {
         const btn = e.target.closest('.quote-btn');
         if (!btn) return;
-        
         e.preventDefault();
-        
-        let products = await fetchProducts();
-        
-        const modal = createModal('Create New Quotation', `
-            <div class="create-quote-form">
-                <div class="form-group">
-                    <label class="form-label">Customer</label>
-                    <select id="quote-customer" class="form-input">
-                        @foreach($customers as $c)
-                            <option value="{{ $c->Customer_ID }}">{{ $c->Institution_Name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Quote Title</label>
-                    <input type="text" id="quote-title" class="form-input" placeholder="e.g., Ultrasound Equipment Package">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Products / Items</label>
-                    <div id="quote-products-list" class="products-selector-container">
-                        <div class="product-row header">
-                            <span style="font-size: 13px; font-weight: 600; color: #6b7280;">Product</span>
-                            <span style="font-size: 13px; font-weight: 600; color: #6b7280;">Qty</span>
-                            <span style="font-size: 13px; font-weight: 600; color: #6b7280;">Price ($)</span>
-                            <span></span>
-                        </div>
-                        <div id="product-rows-container">
-                            <!-- Rows added dynamically -->
-                        </div>
-                    </div>
-                    <button type="button" class="add-product-row-btn">+ Add Product</button>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Total Amount ($)</label>
-                    <input type="number" id="quote-total" class="form-input" placeholder="0.00" readonly>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Valid Until</label>
-                    <input type="date" id="quote-expiry" class="form-input">
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Stage</label>
-                    <select id="quote-stage" class="form-input">
-                        <option value="Draft">Draft</option>
-                        <option value="Pending">Pending</option>
-                        <option value="Sent">Sent</option>
-                    </select>
-                </div>
-            </div>
-        `, `
-            <div class="modal-footer quote-footer">
-                <button class="cancel-quote-btn close-modal">Cancel</button>
-                <button class="generate-send-btn" id="submit-quote-btn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg>
-                    Generate & Send
-                </button>
-            </div>
-        `);
-
-        // Update modal title style
-        const title = modal.querySelector('.modal-header h3');
-        if (title) {
-            title.style.fontSize = '32px';
-            title.style.fontWeight = '700';
-            title.style.color = '#1f2937';
-        }
-
-        const rowsContainer = modal.querySelector('#product-rows-container');
-        const totalInput = modal.querySelector('#quote-total');
-        
-        function addRow() {
-            const row = document.createElement('div');
-            row.className = 'product-row';
-            row.innerHTML = `
-                <select class="form-input product-select" style="padding: 8px 12px; font-size: 14px;">
-                    <option value="">Select Product...</option>
-                    ${products.map(p => `<option value="${p.Product_ID}" data-price="${p.Unit_Price_USD}">${p.Product_Name}</option>`).join('')}
-                </select>
-                <input type="number" class="form-input product-qty" value="1" min="1" style="padding: 8px; text-align: center;">
-                <input type="number" class="form-input product-price" placeholder="0.00" style="padding: 8px; background: #f9fafb;" readonly>
-                <button type="button" class="remove-row" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 20px;">&times;</button>
-            `;
-            rowsContainer.appendChild(row);
-            
-            // Listeners for auto-calc
-            row.querySelector('.product-select').addEventListener('change', (e) => {
-                const opt = e.target.options[e.target.selectedIndex];
-                const price = opt.dataset.price || 0;
-                row.querySelector('.product-price').value = price;
-                updateTotal();
-            });
-            row.querySelector('.product-qty').addEventListener('input', updateTotal);
-            row.querySelector('.remove-row').addEventListener('click', () => {
-                row.remove();
-                updateTotal();
-            });
-        }
-
-        function updateTotal() {
-            let total = 0;
-            rowsContainer.querySelectorAll('.product-row').forEach(row => {
-                const price = parseFloat(row.querySelector('.product-price').value) || 0;
-                const qty = parseInt(row.querySelector('.product-qty').value) || 0;
-                total += price * qty;
-            });
-            totalInput.value = total.toFixed(2);
-        }
-
-        modal.querySelector('.add-product-row-btn').addEventListener('click', addRow);
-        
-        // Add initial row
-        addRow();
-
-        // Submit logic
-        modal.querySelector('#submit-quote-btn').addEventListener('click', async () => {
-            const data = {
-                customer_id: modal.querySelector('#quote-customer').value,
-                title: modal.querySelector('#quote-title').value,
-                items: [],
-                total_amount: modal.querySelector('#quote-total').value,
-                valid_until: modal.querySelector('#quote-expiry').value,
-                status: modal.querySelector('#quote-stage').value
-            };
-
-            rowsContainer.querySelectorAll('.product-row').forEach(row => {
-                const prodId = row.querySelector('.product-select').value;
-                if (prodId) {
-                    data.items.push({
-                        product_id: prodId,
-                        quantity: row.querySelector('.product-qty').value,
-                        price: row.querySelector('.product-price').value
-                    });
-                }
-            });
-
-            if (data.items.length === 0) {
-                alert('Please add at least one product.');
-                return;
-            }
-
-            try {
-                const res = await fetch('/admin/customers/quotation', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify(data)
-                });
-                const json = await res.json();
-                if (json.success) {
-                    showToast('Quotation created successfully!', 'success');
-                    modal.querySelector('.close-modal').click();
-                } else {
-                    showToast(json.message || 'Failed to create quotation', 'error');
-                }
-            } catch (e) {
-                showToast('An error occurred during submission', 'error');
-            }
-        });
+        // Open with no pre-selected customer (user picks from dropdown)
+        openCreateQuoteModal(null, '');
     });
 
     // ========== ANIMATIONS ==========

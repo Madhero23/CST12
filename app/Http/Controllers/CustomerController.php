@@ -387,15 +387,15 @@ class CustomerController extends Controller
             // In a real scenario, this would query customer_interactions with follow_up_date >= today
             // For now, fetching some upcoming follow-ups or mocking based on documentation
             // Using a raw query or Eloquent if available
-            $reminders = \Illuminate\Support\Facades\DB::table('customer_interactions')
-                ->join('customers', 'customer_interactions.Customer_ID', '=', 'customers.Customer_ID')
+            $reminders = \Illuminate\Support\Facades\DB::table('customer_interaction_logs')
+                ->join('customers', 'customer_interaction_logs.Customer_ID', '=', 'customers.Customer_ID')
                 ->whereNotNull('Follow_Up_Date')
                 ->where('Follow_Up_Date', '>=', now()->toDateString())
                 ->orderBy('Follow_Up_Date', 'asc')
                 ->select(
                     'customers.Institution_Name as customer_name',
-                    'customer_interactions.Subject as subject',
-                    'customer_interactions.Follow_Up_Date as due_date',
+                    'customer_interaction_logs.Subject as subject',
+                    'customer_interaction_logs.Follow_Up_Date as due_date',
                     'customers.Segment_Type as priority'
                 )
                 ->limit(5)
