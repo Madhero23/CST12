@@ -127,8 +127,9 @@ class InventoryController extends Controller
         } catch (Throwable $e) {
             return response()->json([
                 'success' => false,
+                'error' => $e->getMessage(),
                 'message' => $e->getMessage(),
-            ], 400); // 400 for bad request (insufficient stock)
+            ], 422); // 422 Unprocessable Entity — zero-stock guard / insufficient stock (FR-INV-02)
         }
     }
 

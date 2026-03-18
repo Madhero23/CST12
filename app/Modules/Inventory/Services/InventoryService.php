@@ -84,7 +84,8 @@ class InventoryService
 
             // FR-INV-02: Zero-stock guard
             if (!$inventory || $inventory->Quantity_Available <= 0) {
-                throw new Exception("Cannot stock out: current stock is zero or unavailable.");
+                $productName = $inventory?->product?->Product_Name ?? \App\Models\Product::find($productId)?->Product_Name ?? 'Unknown';
+                throw new Exception("Invalid action: product [{$productName}] has 0 stocks.");
             }
 
             // FR-INV-03: Insufficient stock guard
