@@ -326,6 +326,14 @@ class ProductController extends Controller
         try {
             $product = $this->productService->updateProduct($id, $request->validated());
 
+            if (!$product) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'No changes were made.',
+                    'no_changes' => true,
+                ]);
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Product updated successfully!',

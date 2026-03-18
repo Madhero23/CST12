@@ -107,7 +107,7 @@
     gap: 16px;
 }
 
-.action-btn {
+/* .action-btn {
     padding: 10px 20px;
     border-radius: 8px;
     border: 1px solid #e2e8f0;
@@ -139,7 +139,7 @@
     background: var(--secondary-color);
     border-color: var(--secondary-color);
     box-shadow: 0 4px 12px rgba(35, 92, 99, 0.2);
-}
+} */
 
 .btn-icon {
     width: 18px;

@@ -584,6 +584,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedStatus = document.querySelector('.status-filter').value;
         const rows = document.querySelectorAll('.table-row');
         
+        let visibleCount = 0;
         rows.forEach(row => {
             const productName = row.querySelector('.product-name').textContent.toLowerCase();
             const productCode = row.querySelector('.product-code')?.textContent.toLowerCase() || '';
@@ -598,10 +599,25 @@ document.addEventListener('DOMContentLoaded', function() {
             if (matchesSearch && matchesCategory && matchesStatus) {
                 row.style.display = '';
                 row.style.animation = 'fadeIn 0.3s ease';
+                visibleCount++;
             } else {
                 row.style.display = 'none';
             }
         });
+
+        // FR-PC-03: Show empty state message when no products match the filter
+        let emptyRow = document.querySelector('.no-results-filter');
+        if (visibleCount === 0 && rows.length > 0) {
+            if (!emptyRow) {
+                const tbody = document.querySelector('.products-table tbody');
+                emptyRow = document.createElement('tr');
+                emptyRow.className = 'no-results-filter';
+                emptyRow.innerHTML = '<td colspan="7" class="no-results">No products found matching your search.</td>';
+                tbody.appendChild(emptyRow);
+            }
+        } else if (emptyRow) {
+            emptyRow.remove();
+        }
     }
     
     // Attach filter listeners
@@ -763,9 +779,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             
             if (data.success) {
-                alert('Product updated successfully!');
+                alert(data.message);
                 closeModal('editProductModal');
-                location.reload();
+                if (!data.no_changes) {
+                    location.reload();
+                }
             } else {
                 alert('Error: ' + (data.message || 'Failed to update product'));
             }

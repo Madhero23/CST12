@@ -270,7 +270,7 @@ class ProductService
      * @throws NotFoundException
      * @throws DatabaseException
      */
-    public function updateProduct(int $id, array $data): Product
+    public function updateProduct(int $id, array $data): ?Product
     {
         return \Illuminate\Support\Facades\DB::transaction(function () use ($id, $data) {
             try {
@@ -287,14 +287,33 @@ class ProductService
                     $data['Unit_Price_USD'] = round($data['Unit_Price_PHP'] / $rate, 2);
                 }
 
-                // 3. Update the product record
-                $product = $this->repository->update($id, $data);
+                // 3. WBT-PC-015: Dirty check — fill attributes and check if anything changed
+                $stockQuantity = $data['Stock_Quantity'] ?? null;
+                $productFields = collect($data)->except(['Stock_Quantity', 'product_image'])->toArray();
+                $product->fill($productFields);
 
-                // 4. Update Inventory if Stock_Quantity provided
-                if (isset($data['Stock_Quantity'])) {
-                    $newQuantity = $data['Stock_Quantity'];
-                    
-                    // Fetch current inventory record for Main Warehouse (Location 1)
+                // Also check if stock quantity actually changed
+                $stockChanged = false;
+                if ($stockQuantity !== null) {
+                    $inventory = \Illuminate\Support\Facades\DB::table('inventories')
+                        ->where('Product_ID', $id)
+                        ->where('Location_ID', 1)
+                        ->first();
+                    $stockChanged = $inventory && (int)$inventory->Quantity_On_Hand !== (int)$stockQuantity;
+                }
+
+                if (!$product->isDirty() && !$stockChanged) {
+                    // No changes detected — skip DB write entirely
+                    return null;
+                }
+
+                // 4. Save the product if dirty
+                if ($product->isDirty()) {
+                    $product->save();
+                }
+
+                // 5. Update Inventory if Stock_Quantity provided and changed
+                if ($stockQuantity !== null && $stockChanged) {
                     $inventory = \Illuminate\Support\Facades\DB::table('inventories')
                         ->where('Product_ID', $id)
                         ->where('Location_ID', 1)
@@ -302,16 +321,16 @@ class ProductService
 
                     if ($inventory) {
                         $oldQuantity = $inventory->Quantity_On_Hand;
-                        $diff = $newQuantity - $oldQuantity;
+                        $diff = $stockQuantity - $oldQuantity;
 
                         if ($diff != 0) {
                             \Illuminate\Support\Facades\DB::table('inventories')
                                 ->where('Inventory_ID', $inventory->Inventory_ID)
                                 ->update([
-                                    'Quantity_On_Hand' => $newQuantity,
-                                    'Quantity_Available' => $newQuantity, // Simplified for now
-                                    'Value_PHP' => $newQuantity * $product->Unit_Price_PHP,
-                                    'Value_USD' => $newQuantity * $product->Unit_Price_USD,
+                                    'Quantity_On_Hand' => $stockQuantity,
+                                    'Quantity_Available' => $stockQuantity, // Simplified for now
+                                    'Value_PHP' => $stockQuantity * $product->Unit_Price_PHP,
+                                    'Value_USD' => $stockQuantity * $product->Unit_Price_USD,
                                     'updated_at' => now(),
                                 ]);
 
@@ -335,10 +354,10 @@ class ProductService
                         \Illuminate\Support\Facades\DB::table('inventories')->insert([
                             'Product_ID' => $id,
                             'Location_ID' => 1,
-                            'Quantity_On_Hand' => $newQuantity,
-                            'Quantity_Available' => $newQuantity,
-                            'Value_PHP' => $newQuantity * $product->Unit_Price_PHP,
-                            'Value_USD' => $newQuantity * $product->Unit_Price_USD,
+                            'Quantity_On_Hand' => $stockQuantity,
+                            'Quantity_Available' => $stockQuantity,
+                            'Value_PHP' => $stockQuantity * $product->Unit_Price_PHP,
+                            'Value_USD' => $stockQuantity * $product->Unit_Price_USD,
                             'created_at' => now(),
                             'updated_at' => now(),
                         ]);
