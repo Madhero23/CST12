@@ -67,14 +67,14 @@ class InventoryController extends Controller
                 'product_id' => 'required|exists:products,Product_ID',
                 'quantity' => 'required|integer|min:1',
                 'location_id' => 'required|exists:locations,Location_ID',
-                'transaction_date' => 'nullable|date',
+                'transaction_date' => 'required|date',
                 'receiving_department' => 'nullable|string|max:255',
                 'shelf' => 'nullable|string|max:100',
                 'rack' => 'nullable|string|max:100',
                 'area' => 'nullable|string|max:100',
                 'batch_number' => 'nullable|string|max:100',
                 'supplier_id' => 'nullable|exists:suppliers,Supplier_ID',
-                'notes' => 'nullable|string',
+                'notes' => 'required|string|min:3', // FR-INV-04: Reason required
             ]);
 
             $inventory = $this->inventoryService->recordStockIn(
@@ -257,6 +257,58 @@ class InventoryController extends Controller
             'success' => false,
             'message' => 'Transfer completion is not yet implemented.',
         ], 501);
+    }
+
+    /**
+     * Export scan logs as CSV
+     */
+    public function exportScanLogCsv(Request $request)
+    {
+        try {
+            $date = $request->query('date', now()->toDateString());
+            $logs = $this->inventoryService->getScanLogs($date);
+            
+            $filename = "scan_{$date}.csv";
+            
+            $headers = [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+                'Pragma' => 'no-cache',
+                'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+                'Expires' => '0',
+            ];
+
+            $callback = function() use ($logs) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, ['Time', 'Product', 'Type', 'Location', 'Quantity']);
+
+                foreach ($logs as $log) {
+                    $time = $log->Transaction_Date ? $log->Transaction_Date->format('h:i A') : 'N/A';
+                    $product = $log->product->Product_Name ?? 'Unknown Product';
+                    
+                    $location = 'N/A';
+                    if ($log->Transaction_Type === 'StockIn') {
+                        $location = $log->destinationLocation->Location_Name ?? 'Unknown Location';
+                    } elseif ($log->Transaction_Type === 'StockOut' || $log->Transaction_Type === 'Transfer') {
+                        $location = $log->sourceLocation->Location_Name ?? 'Unknown Location';
+                    }
+
+                    fputcsv($file, [
+                        $time,
+                        $product,
+                        $log->Transaction_Type,
+                        $location,
+                        $log->Quantity
+                    ]);
+                }
+                fclose($file);
+            };
+
+            return response()->streamDownload($callback, $filename, $headers);
+            
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => 'Export failed'], 500);
+        }
     }
 
     /**

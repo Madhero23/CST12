@@ -350,6 +350,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     </select>
                 </div>
 
+                <div class="inv-form-group">
+                    <label>Reason / Notes <span class="required">*</span></label>
+                    <textarea name="notes" class="inv-form-input" placeholder="e.g., Initial stock, New shipment, Restock" required minlength="3"></textarea>
+                </div>
+
                 <div class="inv-form-alert teal">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"></circle>
@@ -706,7 +711,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         document.getElementById('exportCsvBtn').addEventListener('click', () => {
-             showToast('CSV Exporting is coming soon!', 'info');
+            const date = document.getElementById('scanLogDate').value;
+            window.location.href = `/admin/inventory/scan-logs/export?date=${date}`;
+            showToast(`CSV exported for ${date}`, 'success');
         });
     });
 
