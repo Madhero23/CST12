@@ -597,7 +597,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="fin-form-group">
                     <label>Number of Installments</label>
-                    <input type="number" name="installments" class="fin-form-input" min="2" required placeholder="Enter number">
+                    <input type="number" name="installments" class="fin-form-input" min="2" max="24" required placeholder="Enter number">
+                    <small style="color: #64748b; font-size: 11px; margin-top: 4px; display: block;">Enter a value between 2 and 24 months</small>
                 </div>
                 <div class="fin-form-group">
                     <label>First Payment Due Date</label>
@@ -629,6 +630,12 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.querySelector('input[name="first_due_date"]').value = tomorrow.toISOString().split('T')[0];
 
         modal.querySelector('#submitPlan').addEventListener('click', async function() {
+            const instInput = modal.querySelector('input[name="installments"]');
+            if (instInput.value > 24) {
+                showToast('Maximum installment period is 24 months.', 'error');
+                instInput.classList.add('error-border'); // Optional visual cue
+                return;
+            }
             await submitForm(modal, '#paymentPlanForm', '{{ route("admin.finance.payment-plan") }}', 'Payment plan created successfully!');
         });
     }
@@ -953,6 +960,10 @@ document.addEventListener('DOMContentLoaded', function() {
 .fin-form-errors {
     background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
     padding: 12px 16px; color: #dc2626; font-size: 14px;
+}
+.error-border {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
 }
 .fin-btn {
     padding: 10px 20px; border-radius: 8px; border: none;

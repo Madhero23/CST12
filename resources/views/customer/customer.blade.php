@@ -607,6 +607,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     const result = await response.json();
                     if (result.success) {
+                        if (result.no_changes) {
+                            showToast(result.message || 'No changes were made.', 'info');
+                            this.disabled = false;
+                            this.textContent = 'Update Changes';
+                            return; // Don't close modal or reload
+                        }
                         showToast('Customer updated successfully!', 'success');
                         closeModal(modal);
                         setTimeout(() => window.location.reload(), 500);

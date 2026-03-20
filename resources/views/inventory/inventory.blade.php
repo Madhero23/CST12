@@ -682,13 +682,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (result.success && result.data.length > 0) {
                     listContainer.innerHTML = result.data.map(log => `
-                        <div class="scan-log-card">
+                        <div class="scan-log-card" id="log-row-${log.id}">
                             <div class="scan-log-time">${log.time}</div>
                             <div class="scan-log-details">
                                 <span class="scan-log-text">${log.product} ${log.type === 'StockIn' ? 'received' : (log.type === 'StockOut' ? 'dispatched' : 'scanned')}</span>
                                 <br>
                                 <span class="scan-log-location">at ${log.location}</span>
                             </div>
+                            <button class="btn-delete-log" onclick="deleteLogEntry(${log.id})">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                </svg>
+                            </button>
                         </div>
                     `).join('');
                 } else {
@@ -716,6 +724,42 @@ document.addEventListener('DOMContentLoaded', function() {
             showToast(`CSV exported for ${date}`, 'success');
         });
     });
+
+    window.deleteLogEntry = async function(id) {
+        if (!confirm('Are you sure you want to delete this scan entry? This will reverse the stock impact.')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/admin/inventory/transaction/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                }
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                showToast(result.message, 'success');
+                const row = document.getElementById(`log-row-${id}`);
+                if (row) {
+                    row.style.opacity = '0';
+                    row.style.transform = 'translateX(20px)';
+                    setTimeout(() => row.remove(), 300);
+                }
+                
+                // Refresh main page to show updated stock counts
+                setTimeout(() => window.location.reload(), 800);
+            } else {
+                showToast(result.message || 'Deletion failed', 'error');
+            }
+        } catch (err) {
+            console.error('Delete error:', err);
+            showToast('Network error during deletion', 'error');
+        }
+    };
 
     // ========== FORM SUBMISSION HELPER ==========
 

@@ -448,29 +448,52 @@
         const modal = btn.closest('.modal-overlay');
         const form = modal.querySelector('#newQuotationForm');
         
-        // Manual construction to match the items[] structure expected by the controller
-        const product_id = form.querySelector('[name="product_id"]').value;
-        const quantity = form.querySelector('[name="quantity"]').value;
-        const price = form.querySelector('[name="price"]').value;
+        const customerSelect = form.querySelector('[name="customer_id"]');
+        const productSelect = form.querySelector('[name="product_id"]');
+        const quantityInput = form.querySelector('[name="quantity"]');
+        const priceInput = form.querySelector('[name="price"]');
         
-        if (!product_id || !quantity || !price || !form.querySelector('[name="customer_id"]').value) {
-            showToast('Please fill in all required fields', 'error');
+        // Clear previous errors
+        [customerSelect, productSelect, quantityInput, priceInput].forEach(el => el.classList.remove('error-border'));
+
+        if (!customerSelect.value) {
+            showToast('Customer is required.', 'error');
+            customerSelect.classList.add('error-border');
+            customerSelect.focus();
+            return;
+        }
+        if (!productSelect.value) {
+            showToast('Please select a product.', 'error');
+            productSelect.classList.add('error-border');
+            productSelect.focus();
+            return;
+        }
+        if (!quantityInput.value || quantityInput.value <= 0) {
+            showToast('Please enter a valid quantity.', 'error');
+            quantityInput.classList.add('error-border');
+            quantityInput.focus();
+            return;
+        }
+        if (!priceInput.value || priceInput.value <= 0) {
+            showToast('Please enter a valid price.', 'error');
+            priceInput.classList.add('error-border');
+            priceInput.focus();
             return;
         }
 
         const payload = {
-            customer_id: form.querySelector('[name="customer_id"]').value,
+            customer_id: customerSelect.value,
             title: form.querySelector('#quoteTitleHidden').value || 'New Quotation',
             template_id: form.querySelector('[name="template_id"]').value,
             additional_notes: form.querySelector('[name="additional_notes"]').value,
             valid_until: form.querySelector('[name="valid_until"]').value,
             status: 'Draft',
-            total_amount: price * quantity, // This is expected in validation
+            total_amount: priceInput.value * quantityInput.value, // This is expected in validation
             items: [
                 {
-                    product_id: product_id,
-                    quantity: quantity,
-                    price: price
+                    product_id: productSelect.value,
+                    quantity: quantityInput.value,
+                    price: priceInput.value
                 }
             ]
         };

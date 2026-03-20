@@ -150,15 +150,15 @@ class CustomerController extends Controller
 
             // FR-CRM-04: isDirty guard — return "No changes" if nothing was modified
             $customer = \App\Models\Customer::findOrFail($id);
-            $hasChanges = false;
-            foreach ($validated as $key => $value) {
-                if ($customer->$key != $value) {
-                    $hasChanges = true;
-                    break;
-                }
-            }
-            if (!$hasChanges) {
-                return response()->json(['success' => true, 'message' => 'No changes detected.', 'customer' => $customer]);
+            $customer->fill($validated);
+            
+            if (!$customer->isDirty()) {
+                return response()->json([
+                    'success' => true, 
+                    'no_changes' => true,
+                    'message' => 'No changes were made.',
+                    'customer' => $customer
+                ]);
             }
 
             $customer = $this->customerService->updateCustomer($id, $validated);

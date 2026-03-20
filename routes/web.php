@@ -74,6 +74,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/inventory/transfer/{id}/complete', [InventoryController::class, 'completeTransfer'])->name('inventory.transfer.complete');
     Route::get('/inventory/scan-logs', [InventoryController::class, 'getScanLogs'])->name('inventory.scan-logs');
     Route::get('/inventory/scan-logs/export', [InventoryController::class, 'exportScanLogCsv'])->name('inventory.scan-logs.export');
+    Route::delete('/inventory/transaction/{id}', [InventoryController::class, 'deleteTransaction'])->name('inventory.transaction.delete');
     Route::post('/inventory/scan', [InventoryController::class, 'recordScan'])->name('inventory.scan');
 
     // Customer Management

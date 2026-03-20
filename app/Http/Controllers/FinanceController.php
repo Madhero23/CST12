@@ -83,9 +83,11 @@ class FinanceController extends Controller
                 'customer_id' => 'required|exists:customers,Customer_ID',
                 'sale_id' => 'nullable|exists:sales,Sale_ID',
                 'total_amount' => 'required|numeric|min:1',
-                'installments' => 'required|integer|min:2',
+                'installments' => 'required|integer|min:2|max:24',
                 'first_due_date' => 'required|date|after_or_equal:today',
                 'frequency' => 'required|in:monthly,bi-weekly,weekly',
+            ], [
+                'installments.max' => 'Maximum installment period is 24 months.'
             ]);
 
             // If no Sale_ID provided, create a placeholder sale for this plan

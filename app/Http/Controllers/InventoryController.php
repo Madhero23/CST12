@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Inventory;
+use App\Models\InventoryTransaction;
+use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class InventoryController extends Controller
@@ -231,6 +234,7 @@ class InventoryController extends Controller
                     }
 
                     return [
+                        'id' => $log->Transaction_ID,
                         'time' => $time,
                         'product' => $product,
                         'location' => $location,
@@ -308,6 +312,73 @@ class InventoryController extends Controller
             
         } catch (\Throwable $e) {
             return response()->json(['success' => false, 'message' => 'Export failed'], 500);
+        }
+    }
+
+    /**
+     * Delete an inventory transaction and reverse its stock impact
+     */
+    public function deleteTransaction(int $id): JsonResponse
+    {
+        try {
+            DB::beginTransaction();
+            
+            $transaction = InventoryTransaction::findOrFail($id);
+            $qty = $transaction->Quantity;
+            $productId = $transaction->Product_ID;
+            $type = $transaction->Transaction_Type;
+
+            // Recalculate Stock
+            if ($type === 'StockIn') {
+                $locationId = $transaction->Destination_Location_ID;
+                if ($locationId) {
+                    $inventory = Inventory::where('Product_ID', $productId)
+                                        ->where('Location_ID', $locationId)
+                                        ->first();
+                    if ($inventory) {
+                        $inventory->decrement('Quantity_On_Hand', $qty);
+                        $inventory->Quantity_Available = $inventory->Quantity_On_Hand - $inventory->Quantity_Reserved;
+                        $inventory->save();
+                    }
+                }
+            } elseif ($type === 'StockOut') {
+                $locationId = $transaction->Source_Location_ID;
+                if ($locationId) {
+                    $inventory = Inventory::where('Product_ID', $productId)
+                                        ->where('Location_ID', $locationId)
+                                        ->first();
+                    if ($inventory) {
+                        $inventory->increment('Quantity_On_Hand', $qty);
+                        $inventory->Quantity_Available = $inventory->Quantity_On_Hand - $inventory->Quantity_Reserved;
+                        $inventory->save();
+                    }
+                }
+            }
+
+            // Record activity before deleting
+            $this->logger->logActivity('Transaction Deleted', null, [
+                'tx_id' => $id,
+                'type' => $type,
+                'qty' => $qty,
+                'product_id' => $productId
+            ]);
+
+            $transaction->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Stock in line Deleted successfully.'
+            ]);
+            
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            $this->logger->logError($e, "Failed to delete transaction {$id}");
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete transaction'
+            ], 500);
         }
     }
 
