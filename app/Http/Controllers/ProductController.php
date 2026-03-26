@@ -342,6 +342,12 @@ class ProductController extends Controller
 
         } catch (NotFoundException $e) {
             return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
         } catch (Throwable $e) {
             $this->logger->logError($e, 'Failed to update product', ['product_id' => $id]);
             return response()->json(['success' => false, 'message' => 'Failed to update product. ' . $e->getMessage()], 500);

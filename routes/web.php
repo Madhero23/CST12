@@ -1,11 +1,24 @@
 <?php
 
+/**
+ * Web Routes — RozMed Enterprises Management System
+ *
+ * Pre-existing state: Admin routes had NO auth or role middleware.
+ * Changes: Added auth routes (GET/POST /login, POST /logout),
+ *          wrapped admin routes with 'auth' middleware,
+ *          added 'role:Admin' middleware for user management routes.
+ *
+ * Satisfies: FR-AUTH-07, FR-AUTH-08
+ */
+
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,10 +33,18 @@ use Illuminate\Support\Facades\Route;
 */
 
 // ============================================================================
+// Authentication Routes (public — no middleware)
+// ============================================================================
+
+Route::get('/', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+// ============================================================================
 // Public Routes
 // ============================================================================
 
-Route::get('/', [\App\Http\Controllers\HomeController::class, 'index'])->name('home.index');
+Route::get('/home', [\App\Http\Controllers\HomeController::class, 'index'])->name('home.index');
 
 Route::get('/index', function () {
     return redirect()->route('home.index');
@@ -50,12 +71,12 @@ Route::post('/contact/inquiry', [ProductController::class, 'storeInquiry'])
     ->name('contact.inquiry');
 
 // ============================================================================
-// Admin Routes
+// Admin Routes — Protected by 'auth' middleware (FR-AUTH-08)
 // ============================================================================
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
 
-    // Dashboard
+    // Dashboard — accessible to all authenticated roles
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     // Product Management
@@ -75,6 +96,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/inventory/scan-logs', [InventoryController::class, 'getScanLogs'])->name('inventory.scan-logs');
     Route::get('/inventory/scan-logs/export', [InventoryController::class, 'exportScanLogCsv'])->name('inventory.scan-logs.export');
     Route::delete('/inventory/transaction/{id}', [InventoryController::class, 'deleteTransaction'])->name('inventory.transaction.delete');
+    Route::delete('/inventory/{id}', [InventoryController::class, 'destroyInventory'])->name('inventory.destroy');
     Route::post('/inventory/scan', [InventoryController::class, 'recordScan'])->name('inventory.scan');
 
     // Customer Management
@@ -86,7 +108,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/customers/interaction', [CustomerController::class, 'addInteractionLog'])->name('customers.interaction');
     Route::get('/customers/{id}/interactions', [CustomerController::class, 'getInteractionLogs'])->name('customers.interactions');
     Route::get('/customers/reminders', [CustomerController::class, 'reminders'])->name('customers.reminders');
-    Route::put('/customers/quotation/{id}/status', [CustomerController::class, 'updateQuotationStatus'])->name('customers.quotation.status');  // FR-CRM-08
+    Route::put('/customers/quotation/{id}/status', [CustomerController::class, 'updateQuotationStatus'])->name('customers.quotation.status');
 
     // Finance Management
     Route::get('/finance', [FinanceController::class, 'index'])->name('finance');
@@ -108,4 +130,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Quotation Templates
     Route::post('/quotation-templates/save', [DocumentController::class, 'saveTemplate'])->name('quotation-templates.save');
     Route::delete('/quotation-templates/{id}', [DocumentController::class, 'deleteTemplate'])->name('quotation-templates.delete');
+
+    // ========================================================================
+    // Admin-Only Routes — Restricted by 'role:Admin' middleware (FR-AUTH-07)
+    // ========================================================================
+
+    Route::middleware(['role:Admin'])->group(function () {
+        Route::get('/users', [UserController::class, 'index'])->name('users');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    });
 });

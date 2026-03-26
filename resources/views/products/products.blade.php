@@ -85,9 +85,17 @@
 
                     <div class="products-grid" id="productsGrid">
                         @forelse($products as $product)
+                        @php
+                            $stockStatus = 'out-of-stock';
+                            if ($product->total_stock > 0 && $product->total_stock <= ($product->Min_Stock_Level ?? 0)) {
+                                $stockStatus = 'low-stock';
+                            } elseif ($product->total_stock > 0) {
+                                $stockStatus = 'in-stock';
+                            }
+                        @endphp
                         <div class="product-card" 
                              data-category="{{ $product->Category }}"
-                             data-stock="@if($product->total_stock > 0 && $product->total_stock <= $product->Min_Stock_Level)low-stock @elseif($product->total_stock > 0)in-stock @else out-of-stock @endif">
+                             data-stock="{{ $stockStatus }}">
                             <div class="product-image-container">
                                 @if($product->Images_Path)
                                     <img src="{{ asset('storage/' . $product->Images_Path) }}" 
@@ -131,16 +139,8 @@
                                 <div class="product-footer">
                                     <div class="product-price">₱{{ number_format($product->Unit_Price_PHP, 0) }}</div>
                                     
-                                    @php
-                                        $stockStatus = $product->total_stock > 0 ? 'in-stock' : 'out-of-stock';
-                                        $stockText = $product->total_stock > 0 ? 'In Stock' : 'Out of Stock';
-                                        if ($product->total_stock > 0 && $product->total_stock <= $product->Min_Stock_Level) {
-                                            $stockStatus = 'low-stock';
-                                            $stockText = 'Low Stock';
-                                        }
-                                    @endphp
                                     <div class="stock-pill {{ $stockStatus }}">
-                                        {{ $stockText }}
+                                        {{ ucwords(str_replace('-', ' ', $stockStatus)) }}
                                     </div>
                                 </div>
 
@@ -179,15 +179,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function filterProducts() {
         const searchTerm = searchInput.value.toLowerCase();
-        const category = categoryFilter.value;
-        const status = statusFilter.value;
+        const category = (categoryFilter?.value || '').trim();
+        const status = (statusFilter?.value || '').trim();
         const allCards = document.querySelectorAll('.product-card');
         let visibleCards = 0;
         
         allCards.forEach(card => {
             const title = card.querySelector('.product-title').textContent.toLowerCase();
-            const productCategory = card.getAttribute('data-category');
-            const stockStatus = card.getAttribute('data-stock');
+            const productCategory = (card.getAttribute('data-category') || '').trim();
+            const stockStatus = (card.getAttribute('data-stock') || '').trim();
             
             const matchesSearch = !searchTerm || title.includes(searchTerm);
             const matchesCategory = !category || productCategory === category;

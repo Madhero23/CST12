@@ -382,6 +382,35 @@ class InventoryController extends Controller
         }
     }
 
+    public function destroyInventory(int $id): JsonResponse
+    {
+        try {
+            $inventory = Inventory::find($id);
+            if (!$inventory) {
+                return response()->json(['success' => false, 'message' => 'Inventory record not found.'], 404);
+            }
+
+            $productName = $inventory->product->Product_Name ?? 'Unknown Product';
+            $inventory->delete();
+
+            $this->logger->logActivity('Inventory record deleted', null, [
+                'inventory_id' => $id,
+                'product_name' => $productName
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Inventory record for {$productName} has been deleted successfully."
+            ]);
+        } catch (Throwable $e) {
+            $this->logger->logError($e, 'Failed to delete inventory record', ['inventory_id' => $id]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete inventory record.'
+            ], 500);
+        }
+    }
+
     /**
      * Record a barcode/QR scan (stub — not yet implemented)
      */

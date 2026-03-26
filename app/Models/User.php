@@ -52,7 +52,15 @@ class User extends Authenticatable
     {
         return [
             'Last_Login' => 'datetime',
-            'Password_Hash' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the password for the user (maps Password_Hash to Laravel's auth system).
+     * Required because the password column is named Password_Hash, not 'password'.
+     */
+    public function getAuthPassword(): string
+    {
+        return $this->Password_Hash;
     }
 }

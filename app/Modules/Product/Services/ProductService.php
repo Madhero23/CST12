@@ -216,7 +216,13 @@ class ProductService
                     $data['Product_Code'] = 'PRD-' . strtoupper(\Illuminate\Support\Str::random(8));
                 }
 
-                // 3. Create the product
+                // 3. Handle Image Upload
+                if (isset($data['product_image']) && $data['product_image'] instanceof \Illuminate\Http\UploadedFile) {
+                    $imagePath = $data['product_image']->store('products', 'public');
+                    $data['Images_Path'] = $imagePath;
+                }
+
+                // 4. Create the product
                 $product = $this->repository->create($data);
 
                 // 4. Initialize Inventory at Main Warehouse (ID: 1)
@@ -277,48 +283,62 @@ class ProductService
                 // 1. Get current product state
                 $product = $this->repository->findOrFail($id);
 
-                // 2. Recalculate Unit_Price_USD if PHP price changed
-                if (isset($data['Unit_Price_PHP']) && $data['Unit_Price_PHP'] != $product->Unit_Price_PHP) {
+                // Initialize stock tracking
+                $stockQuantity = isset($data['Stock_Quantity']) ? (int) $data['Stock_Quantity'] : null;
+                $stockChanged = false;
+                
+                // Get current stock
+                $inventory = \Illuminate\Support\Facades\DB::table('inventories')
+                    ->where('Product_ID', $id)
+                    ->where('Location_ID', 1)
+                    ->first();
+                
+                if ($inventory && $stockQuantity !== null) {
+                    $stockChanged = ($inventory->Quantity_On_Hand != $stockQuantity);
+                } elseif (!$inventory && $stockQuantity !== null && $stockQuantity > 0) {
+                    $stockChanged = true;
+                }
+
+                // 2. Extract fields for Product model (excluding Stock_Quantity and image)
+                $productFields = collect($data)->except(['Stock_Quantity', 'product_image'])->toArray();
+
+                // 3. Recalculate Unit_Price_USD if PHP price changed
+                if (isset($productFields['Unit_Price_PHP']) && $productFields['Unit_Price_PHP'] != $product->Unit_Price_PHP) {
                     $rate = \Illuminate\Support\Facades\DB::table('exchange_rates')
                         ->where('Currency_Pair', 'USD-PHP')
                         ->orderBy('Effective_Date', 'desc')
                         ->value('Rate_Value') ?? 57.00;
                     
-                    $data['Unit_Price_USD'] = round($data['Unit_Price_PHP'] / $rate, 2);
+                    $productFields['Unit_Price_USD'] = round($productFields['Unit_Price_PHP'] / $rate, 2);
                 }
 
-                // 3. WBT-PC-015: Dirty check — fill attributes and check if anything changed
-                $stockQuantity = $data['Stock_Quantity'] ?? null;
-                $productFields = collect($data)->except(['Stock_Quantity', 'product_image'])->toArray();
+                // Fill the model with new values
                 $product->fill($productFields);
 
-                // Also check if stock quantity actually changed
-                $stockChanged = false;
-                if ($stockQuantity !== null) {
-                    $inventory = \Illuminate\Support\Facades\DB::table('inventories')
-                        ->where('Product_ID', $id)
-                        ->where('Location_ID', 1)
-                        ->first();
-                    $stockChanged = $inventory && (int)$inventory->Quantity_On_Hand !== (int)$stockQuantity;
+                // 4. Handle Image Upload/Replacement
+                $imageUploaded = false;
+                if (isset($data['product_image']) && $data['product_image'] instanceof \Illuminate\Http\UploadedFile) {
+                    // Delete old image if exists
+                    if ($product->Images_Path && \Illuminate\Support\Facades\Storage::disk('public')->exists($product->Images_Path)) {
+                        \Illuminate\Support\Facades\Storage::disk('public')->delete($product->Images_Path);
+                    }
+                    $imagePath = $data['product_image']->store('products', 'public');
+                    $product->Images_Path = $imagePath;
+                    $imageUploaded = true;
                 }
 
-                if (!$product->isDirty() && !$stockChanged) {
+                if (!$product->isDirty() && !$stockChanged && !$imageUploaded) {
                     // No changes detected — skip DB write entirely
                     return null;
                 }
 
-                // 4. Save the product if dirty
+                // 5. Save the product if dirty
                 if ($product->isDirty()) {
                     $product->save();
                 }
 
-                // 5. Update Inventory if Stock_Quantity provided and changed
+                // 6. Update Inventory if Stock_Quantity provided and changed
                 if ($stockQuantity !== null && $stockChanged) {
-                    $inventory = \Illuminate\Support\Facades\DB::table('inventories')
-                        ->where('Product_ID', $id)
-                        ->where('Location_ID', 1)
-                        ->first();
-
                     if ($inventory) {
                         $oldQuantity = $inventory->Quantity_On_Hand;
                         $diff = $stockQuantity - $oldQuantity;
@@ -328,9 +348,9 @@ class ProductService
                                 ->where('Inventory_ID', $inventory->Inventory_ID)
                                 ->update([
                                     'Quantity_On_Hand' => $stockQuantity,
-                                    'Quantity_Available' => $stockQuantity, // Simplified for now
+                                    'Quantity_Available' => $stockQuantity,
                                     'Value_PHP' => $stockQuantity * $product->Unit_Price_PHP,
-                                    'Value_USD' => $stockQuantity * $product->Unit_Price_USD,
+                                    'Value_USD' => $stockQuantity * ($product->Unit_Price_USD ?? 0),
                                     'updated_at' => now(),
                                 ]);
 
@@ -350,14 +370,14 @@ class ProductService
                             ]);
                         }
                     } else {
-                        // Create inventory if missing for some reason
+                        // Create inventory if missing
                         \Illuminate\Support\Facades\DB::table('inventories')->insert([
                             'Product_ID' => $id,
                             'Location_ID' => 1,
                             'Quantity_On_Hand' => $stockQuantity,
                             'Quantity_Available' => $stockQuantity,
                             'Value_PHP' => $stockQuantity * $product->Unit_Price_PHP,
-                            'Value_USD' => $stockQuantity * $product->Unit_Price_USD,
+                            'Value_USD' => $stockQuantity * ($product->Unit_Price_USD ?? 0),
                             'created_at' => now(),
                             'updated_at' => now(),
                         ]);

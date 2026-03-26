@@ -41,7 +41,8 @@
                                 @if($product->Images_Path)
                                     <img src="{{ asset('storage/' . $product->Images_Path) }}" 
                                          alt="{{ $product->Product_Name }}" 
-                                         class="product-main-image">
+                                         class="product-main-image"
+                                         onerror="this.src='{{ asset('default-product.jpg') }}';">
                                 @else
                                     <img src="{{ asset('default-product.jpg') }}" 
                                          alt="{{ $product->Product_Name }}" 

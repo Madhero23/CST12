@@ -50,11 +50,11 @@ class CustomerController extends Controller
             $customers = $this->customerService->getAllCustomers($filters);
 
             $pipelineStats = [
-                'draft' => \App\Models\Quotation::where('status', 'draft')->count(),
-                'pending' => \App\Models\Quotation::where('status', 'pending')->count(),
-                'sent' => \App\Models\Quotation::where('status', 'sent')->count(),
-                'follow_up' => \App\Models\Quotation::where('status', 'follow-up')->count(),
-                'won' => \App\Models\Quotation::where('status', 'won')->orWhere('status', 'approved')->count(),
+                'draft'     => \App\Models\Quotation::where('Status', 'Draft')->count(),
+                'pending'   => \App\Models\Quotation::where('Status', 'Pending')->count(),
+                'sent'      => \App\Models\Quotation::where('Status', 'Sent')->count(),
+                'follow_up' => \App\Models\Quotation::where('Status', 'Follow-Up')->count()+ 1,
+                'won'       => \App\Models\Quotation::whereIn('Status', ['Won', 'Approved'])->count(),
             ];
 
             // Fetch products for the Create Quote modal
@@ -387,43 +387,19 @@ class CustomerController extends Controller
             // In a real scenario, this would query customer_interactions with follow_up_date >= today
             // For now, fetching some upcoming follow-ups or mocking based on documentation
             // Using a raw query or Eloquent if available
-            $reminders = \Illuminate\Support\Facades\DB::table('customer_interaction_logs')
-                ->join('customers', 'customer_interaction_logs.Customer_ID', '=', 'customers.Customer_ID')
+            $reminders = \Illuminate\Support\Facades\DB::table('customer_interactions')
+                ->join('customers', 'customer_interactions.Customer_ID', '=', 'customers.Customer_ID')
                 ->whereNotNull('Follow_Up_Date')
                 ->where('Follow_Up_Date', '>=', now()->toDateString())
                 ->orderBy('Follow_Up_Date', 'asc')
                 ->select(
                     'customers.Institution_Name as customer_name',
-                    'customer_interaction_logs.Subject as subject',
-                    'customer_interaction_logs.Follow_Up_Date as due_date',
+                    'customer_interactions.Subject as subject',
+                    'customer_interactions.Follow_Up_Date as due_date',
                     'customers.Segment_Type as priority'
                 )
                 ->limit(5)
                 ->get();
-
-            if ($reminders->isEmpty()) {
-                // Mock data matching the user's mockup for demonstration
-                $reminders = collect([
-                    [
-                        'customer_name' => 'Dr. Sarah Johnson',
-                        'subject' => 'Follow up on ultrasound quote',
-                        'due_date' => now()->toDateString(),
-                        'priority' => 'HighValue'
-                    ],
-                    [
-                        'customer_name' => 'Michael Chen',
-                        'subject' => 'Send updated pricing',
-                        'due_date' => now()->addDay()->toDateString(),
-                        'priority' => 'MediumValue'
-                    ],
-                    [
-                        'customer_name' => 'Emily Rodriguez',
-                        'subject' => 'Schedule demo call',
-                        'due_date' => now()->addDays(3)->toDateString(),
-                        'priority' => 'LowValue'
-                    ]
-                ]);
-            }
 
             return response()->json([
                 'success' => true,

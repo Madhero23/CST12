@@ -1,7 +1,8 @@
 <!-- Google Fonts for Instrument Sans -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap"
+    rel="stylesheet">
 
 @vite(['resources/css/document.css'])
 <div class="admin-dashboard-container">
@@ -12,175 +13,273 @@
             <div class="page-header">
                 <h1 class="page-title">Document Management</h1>
             </div>
-        
-        <div class="doc-main-card" data-animate="fade-in">
-            <div class="doc-section-header">
-                <h2 class="doc-section-title">Document Management</h2>
-                <div class="header-actions">
-                    <button class="btn btn-outline" onclick="openTemplatesModal()">
-                        <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"/></svg>
-                        <span>Manage Templates</span>
-                    </button>
-                    <button class="btn btn-outline" onclick="openUploadModal()">
-                        <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                        <span>Upload Document</span>
-                    </button>
-                    <button class="btn btn-primary" onclick="openNewQuotationModal()">
-                        <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        <span>+ New Quotation</span>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="stats-grid">
-                <div class="stat-item" data-animate="fade-up">
-                    <div class="stat-icon-wrapper" style="background-color: var(--fin-teal);">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14.5 2 14.5 8 20 8"></polyline><path d="m9 13 2 2 4-4"></path></svg>
+
+            <div class="doc-main-card" data-animate="fade-in">
+                <div class="doc-section-header">
+                    <h2 class="doc-section-title">Document Management</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-outline" onclick="openTemplatesModal()">
+                            <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="10" rx="2" />
+                                <path d="M7 11V7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1" />
+                            </svg>
+                            <span>Manage Templates</span>
+                        </button>
+                        <button class="btn btn-outline" onclick="openUploadModal()">
+                            <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            <span>Upload Document</span>
+                        </button>
+                        <button class="btn btn-primary" onclick="openNewQuotationModal()">
+                            <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            <span>New Quotation</span>
+                        </button>
                     </div>
-                    <div class="stat-val">{{ $stats['active'] }}</div>
-                    <div class="stat-txt">Active Quotations</div>
                 </div>
-                <div class="stat-item" data-animate="fade-up" style="animation-delay: 0.1s">
-                    <div class="stat-icon-wrapper" style="background-color: #5fb1b7;">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path></svg>
+
+                <div class="stats-grid">
+                    <div class="stat-item" data-animate="fade-up">
+                        <div class="stat-icon-wrapper" style="background-color: var(--fin-teal);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                                <polyline points="14.5 2 14.5 8 20 8"></polyline>
+                                <path d="m9 13 2 2 4-4"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-val">{{ $stats['active'] }}</div>
+                        <div class="stat-txt">Active Quotations</div>
                     </div>
-                    <div class="stat-val">{{ $stats['templates'] }}</div>
-                    <div class="stat-txt">Templates</div>
-                </div>
-                <div class="stat-item" data-animate="fade-up" style="animation-delay: 0.2s">
-                    <div class="stat-icon-wrapper" style="background-color: #22c55e;">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                    <div class="stat-item" data-animate="fade-up" style="animation-delay: 0.1s">
+                        <div class="stat-icon-wrapper" style="background-color: #5fb1b7;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z">
+                                </path>
+                            </svg>
+                        </div>
+                        <div class="stat-val">{{ $stats['templates'] }}</div>
+                        <div class="stat-txt">Templates</div>
                     </div>
-                    <div class="stat-val">{{ $stats['certificates'] }}</div>
-                    <div class="stat-txt">Certificates</div>
-                </div>
-                <div class="stat-item" data-animate="fade-up" style="animation-delay: 0.3s">
-                    <div class="stat-icon-wrapper" style="background-color: #f97316;">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <div class="stat-item" data-animate="fade-up" style="animation-delay: 0.2s">
+                        <div class="stat-icon-wrapper" style="background-color: #22c55e;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                <path d="m9 12 2 2 4-4"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-val">{{ $stats['certificates'] }}</div>
+                        <div class="stat-txt">Certificates</div>
                     </div>
-                    <div class="stat-val">{{ $stats['avgDays'] }}</div>
-                    <div class="stat-txt">Avg Days Open</div>
+                    <div class="stat-item" data-animate="fade-up" style="animation-delay: 0.3s">
+                        <div class="stat-icon-wrapper" style="background-color: #f97316;">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-val">{{ $stats['avgDays'] }}</div>
+                        <div class="stat-txt">Avg Days Open</div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="doc-controls">
-                <div class="doc-search-wrapper">
-                    <svg class="doc-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    <input type="text" class="doc-search-input" placeholder="Search by quotation # or customer...">
+
+                <div class="doc-controls">
+                    <div class="doc-search-wrapper">
+                        <svg class="doc-search-icon" width="16" height="16" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" class="doc-search-input"
+                            placeholder="Search by quotation # or customer...">
+                    </div>
+                    <select class="doc-status-filter">
+                        <option value="all">All Status</option>
+                        <option value="draft">Draft</option>
+                        <option value="sent">Sent</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="won">Won</option>
+                        <option value="lost">Lost</option>
+                    </select>
                 </div>
-                <select class="doc-status-filter">
-                    <option value="all">All Status</option>
-                    <option value="draft">Draft</option>
-                    <option value="sent">Sent</option>
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="won">Won</option>
-                    <option value="lost">Lost</option>
-                </select>
+
+                <div class="doc-table">
+                    <div class="table-head">
+                        <div class="th">Quotation ID</div>
+                        <div class="th">Customer</div>
+                        <div class="th">Product</div>
+                        <div class="th">Amount</div>
+                        <div class="th">Version</div>
+                        <div class="th">Status</div>
+                        <div class="th">Actions</div>
+                    </div>
+
+                    <div class="table-body">
+                        @forelse($quotations as $row)
+                            @php
+                                $firstProduct = $row->lineItems->first()?->product?->Product_Name ?? 'No Product';
+                                if ($row->lineItems->count() > 1) {
+                                    $firstProduct =
+                                        ($row->lineItems->first()?->product?->Product_Name ?? 'No Product') . ' ...';
+                                }
+                            @endphp
+                            <div class="table-row" data-status="{{ strtolower($row->Status) }}">
+                                <div class="td quote-id">{{ $row->Quotation_Number }}</div>
+                                <div class="td">{{ $row->customer->Institution_Name ?? 'N/A' }}</div>
+                                <div class="td" style="color: #64748b;">{{ $firstProduct }}</div>
+                                <div class="td" style="font-weight: 700;">
+                                    ₱{{ number_format($row->Total_Amount_PHP, 0) }}</div>
+                                <div class="td">
+                                    <span class="version-badge">v{{ $row->Version_Number }}</span>
+                                </div>
+                                <div class="td">
+                                    <span
+                                        class="status-pill status-{{ strtolower($row->Status) }}">{{ $row->Status }}</span>
+                                </div>
+                                <div class="td">
+                                    <div class="action-links">
+                                        <svg class="icon-action view-quote-btn" width="18" height="18"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" data-quote-id="{{ $row->Quotation_ID }}"
+                                            title="View Details">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                        @if (!in_array($row->Status, ['Won', 'Lost']))
+                                            <span class="action-link"
+                                                onclick="openReviseModal({{ $row->Quotation_ID }})">Revise</span>
+                                        @endif
+                                        <span class="action-link"
+                                            onclick="openStatusModal({{ $row->Quotation_ID }}, '{{ $row->Status }}')">Status</span>
+                                        <svg class="icon-action" width="18" height="18" viewBox="0 0 24 24"
+                                            fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            onclick="window.location.href='{{ route('admin.documents.download', $row->Quotation_ID) }}'"
+                                            title="Download">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                            <polyline points="7 10 12 15 17 10" />
+                                            <line x1="12" y1="15" x2="12" y2="3" />
+                                        </svg>
+                                        <svg class="icon-action" width="18" height="18" viewBox="0 0 24 24"
+                                            fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            onclick="openVersionHistoryModal({{ $row->Quotation_ID }})"
+                                            title="History">
+                                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                            <path d="M3 3v5h5" />
+                                            <path d="M12 7v5l4 2" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="table-row"
+                                style="grid-template-columns: 1fr; text-align: center; padding: 3rem;">
+                                <div class="td" style="color: var(--fin-gray);">No quotations found. Start by
+                                    creating one.</div>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
             </div>
 
-            <div class="doc-table">
-                <div class="table-head">
-                    <div class="th">Quotation ID</div>
-                    <div class="th">Customer</div>
-                    <div class="th">Product</div>
-                    <div class="th">Amount</div>
-                    <div class="th">Version</div>
-                    <div class="th">Status</div>
-                    <div class="th">Actions</div>
-                </div>
-                
-                <div class="table-body">
-                    @forelse($quotations as $row)
-                    @php
-                        $firstProduct = $row->lineItems->first()?->product?->Product_Name ?? 'No Product';
-                        if ($row->lineItems->count() > 1) {
-                            $firstProduct = ($row->lineItems->first()?->product?->Product_Name ?? 'No Product') . ' ...';
-                        }
-                    @endphp
-                    <div class="table-row" data-status="{{ strtolower($row->Status) }}">
-                        <div class="td quote-id">{{ $row->Quotation_Number }}</div>
-                        <div class="td">{{ $row->customer->Institution_Name ?? 'N/A' }}</div>
-                        <div class="td" style="color: #64748b;">{{ $firstProduct }}</div>
-                        <div class="td" style="font-weight: 700;">₱{{ number_format($row->Total_Amount_PHP, 0) }}</div>
-                        <div class="td">
-                            <span class="version-badge">v{{ $row->Version_Number }}</span>
-                        </div>
-                        <div class="td">
-                            <span class="status-pill status-{{ strtolower($row->Status) }}">{{ $row->Status }}</span>
-                        </div>
-                        <div class="td">
-                            <div class="action-links">
-                                <svg class="icon-action view-quote-btn" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-quote-id="{{ $row->Quotation_ID }}" title="View Details"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                @if(!in_array($row->Status, ['Won', 'Lost']))
-                                <span class="action-link" onclick="openReviseModal({{ $row->Quotation_ID }})">Revise</span>
-                                @endif
-                                <span class="action-link" onclick="openStatusModal({{ $row->Quotation_ID }}, '{{ $row->Status }}')">Status</span>
-                                <svg class="icon-action" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" onclick="window.location.href='{{ route('admin.documents.download', $row->Quotation_ID) }}'" title="Download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                <svg class="icon-action" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" onclick="openVersionHistoryModal({{ $row->Quotation_ID }})" title="History"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+            <div class="doc-footer-grid">
+                <div class="footer-section" data-animate="fade-in">
+                    <div class="footer-header">
+                        <h3 class="footer-title">Supporting Documents</h3>
+                    </div>
+                    <div class="file-list">
+                        @forelse($documents as $doc)
+                            <div class="file-item" data-doc-id="{{ $doc->Document_ID }}">
+                                <div class="file-info">
+                                    <div class="file-icon-box">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                            stroke="#22c55e" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path
+                                                d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z">
+                                            </path>
+                                            <polyline points="14.5 2 14.5 8 20 8"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div class="file-details">
+                                        <div class="file-name">{{ $doc->File_Name }}</div>
+                                        <div class="file-meta">{{ $doc->Document_Type }} •
+                                            {{ round($doc->File_Size / 1024 / 1024, 1) }}
+                                            MB{{ $doc->Related_Entity_Type ? ' • Linked to: ' . $doc->Related_Entity_Type : '' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="file-actions">
+                                    <svg class="icon-action" width="18" height="18" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        onclick="window.location.href='{{ route('admin.documents.download', $doc->Document_ID) }}'"
+                                        title="Download">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="7 10 12 15 17 10" />
+                                        <line x1="12" y1="15" x2="12" y2="3" />
+                                    </svg>
+                                    <svg class="icon-action doc-delete-btn" width="18" height="18"
+                                        viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round"
+                                        data-doc-id="{{ $doc->Document_ID }}" data-doc-name="{{ $doc->File_Name }}"
+                                        title="Delete">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path
+                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                        </path>
+                                    </svg>
+                                </div>
                             </div>
-                        </div>
+                        @empty
+                            <p style="color: var(--fin-gray); text-align: center; padding: 1rem;">No files uploaded.
+                            </p>
+                        @endforelse
                     </div>
-                    @empty
-                    <div class="table-row" style="grid-template-columns: 1fr; text-align: center; padding: 3rem;">
-                        <div class="td" style="color: var(--fin-gray);">No quotations found. Start by creating one.</div>
+                </div>
+
+                <div class="footer-section" data-animate="fade-in">
+                    <div class="footer-header">
+                        <h3 class="footer-title" style="margin: 0;">Quotation Templates</h3>
+                        <button class="plus-btn" onclick="openTemplatesModal()">+</button>
                     </div>
-                    @endforelse
+                    <div class="template-list">
+                        @forelse($templates as $tpl)
+                            <div class="template-item" onclick="openTemplatesModal({{ $tpl->Template_ID }})"
+                                style="cursor: pointer;">
+                                <div class="template-info">
+                                    <div class="template-name">{{ $tpl->Template_Name }}</div>
+                                    <div class="template-meta">{{ $tpl->Template_Type }}</div>
+                                </div>
+                                <svg class="icon-action" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" style="opacity: 0.5;">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                </svg>
+                            </div>
+                        @empty
+                            <p style="color: var(--fin-gray); text-align: center; padding: 1rem; font-size: 0.85rem;">
+                                No templates yet. Click + to create one.</p>
+                        @endforelse
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="doc-footer-grid">
-            <div class="footer-section" data-animate="fade-in">
-                <div class="footer-header">
-                    <h3 class="footer-title">Supporting Documents</h3>
-                </div>
-                <div class="file-list">
-                    @forelse($documents as $doc)
-                    <div class="file-item" data-doc-id="{{ $doc->Document_ID }}">
-                        <div class="file-info">
-                            <div class="file-icon-box">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14.5 2 14.5 8 20 8"></polyline></svg>
-                            </div>
-                            <div class="file-details">
-                                <div class="file-name">{{ $doc->File_Name }}</div>
-                                <div class="file-meta">{{ $doc->Document_Type }} • {{ round($doc->File_Size / 1024 / 1024, 1) }} MB{{ $doc->Related_Entity_Type ? ' • Linked to: ' . $doc->Related_Entity_Type : '' }}</div>
-                            </div>
-                        </div>
-                        <div class="file-actions">
-                            <svg class="icon-action" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" onclick="window.location.href='{{ route('admin.documents.download', $doc->Document_ID) }}'" title="Download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                            <svg class="icon-action doc-delete-btn" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-doc-id="{{ $doc->Document_ID }}" data-doc-name="{{ $doc->File_Name }}" title="Delete"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </div>
-                    </div>
-                    @empty
-                    <p style="color: var(--fin-gray); text-align: center; padding: 1rem;">No files uploaded.</p>
-                    @endforelse
-                </div>
-            </div>
-            
-            <div class="footer-section" data-animate="fade-in">
-                <div class="footer-header">
-                    <h3 class="footer-title" style="margin: 0;">Quotation Templates</h3>
-                    <button class="plus-btn" onclick="openTemplatesModal()">+</button>
-                </div>
-                <div class="template-list">
-                    @forelse($templates as $tpl)
-                    <div class="template-item" onclick="openTemplatesModal({{ $tpl->Template_ID }})" style="cursor: pointer;">
-                        <div class="template-info">
-                            <div class="template-name">{{ $tpl->Template_Name }}</div>
-                            <div class="template-meta">{{ $tpl->Template_Type }}</div>
-                        </div>
-                        <svg class="icon-action" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                    </div>
-                    @empty
-                    <p style="color: var(--fin-gray); text-align: center; padding: 1rem; font-size: 0.85rem;">No templates yet. Click + to create one.</p>
-                    @endforelse
-                </div>
-            </div>
-        </div>
     </main>
 </div>
 
@@ -202,7 +301,7 @@
             </div>
         `;
         document.body.appendChild(overlay);
-        
+
         requestAnimationFrame(() => {
             overlay.classList.add('modal-opening');
         });
@@ -297,14 +396,14 @@
             <button class="btn btn-primary btn-solid-teal" onclick="submitUpload(this)">Upload Document</button>
         `;
         const modal = createModal('Manage Supporting Documents', body, footer);
-        
+
         const typeSelect = modal.querySelector('#relatedTypeSelector');
         const idSelect = modal.querySelector('#relatedIdSelector');
-        
+
         typeSelect.addEventListener('change', () => {
             const type = typeSelect.value;
             idSelect.innerHTML = '<option value="">Loading...</option>';
-            
+
             if (!type) {
                 idSelect.innerHTML = '<option value="">N/A</option>';
                 return;
@@ -313,24 +412,25 @@
             // Client-side populate from already available data
             if (type === 'Customer') {
                 idSelect.innerHTML = `<option value="">Select Customer...</option>
-                    @foreach($customers as $c)
+                    @foreach ($customers as $c)
                         <option value="{{ $c->Customer_ID }}">{{ $c->Institution_Name }}</option>
                     @endforeach`;
             } else if (type === 'Quotation') {
                 idSelect.innerHTML = `<option value="">Select Quotation...</option>
-                    @foreach($quotations as $q)
+                    @foreach ($quotations as $q)
                         <option value="{{ $q->Quotation_ID }}">{{ $q->Quotation_Number }}</option>
                     @endforeach`;
             } else if (type === 'Product') {
                 idSelect.innerHTML = `<option value="">Select Product...</option>
-                    @foreach($products as $p)
+                    @foreach ($products as $p)
                         <option value="{{ $p->Product_ID }}">{{ $p->Product_Name }}</option>
                     @endforeach`;
             } else if (type === 'Sale') {
                 const sales = @json($sales);
                 idSelect.innerHTML = `<option value="">Select Invoice...</option>`;
                 sales.forEach(s => {
-                    idSelect.innerHTML += `<option value="${s.Sale_ID}">INV-${String(s.Sale_ID).padStart(4, '0')} (${s.customer?.Institution_Name || 'N/A'})</option>`;
+                    idSelect.innerHTML +=
+                        `<option value="${s.Sale_ID}">INV-${String(s.Sale_ID).padStart(4, '0')} (${s.customer?.Institution_Name || 'N/A'})</option>`;
                 });
             } else {
                 idSelect.innerHTML = '<option value="">Select Record...</option>';
@@ -342,14 +442,16 @@
         const modal = btn.closest('.modal-overlay');
         const form = modal.querySelector('#uploadForm');
         const formData = new FormData(form);
-        
+
         btn.disabled = true;
         btn.innerText = 'Uploading...';
-        
+
         try {
             const response = await fetch('{{ route('admin.documents.upload') }}', {
                 method: 'POST',
-                headers: { 'X-CSRF-TOKEN': csrfToken },
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                },
                 body: formData
             });
             const result = await response.json();
@@ -375,7 +477,7 @@
                     <label>Select Template</label>
                     <select name="template_id" class="form-control">
                         <option value="">Select Template...</option>
-                        @foreach($templates as $t)
+                        @foreach ($templates as $t)
                             <option value="{{ $t->Template_ID }}">{{ $t->Template_Name }}</option>
                         @endforeach
                     </select>
@@ -385,7 +487,7 @@
                     <label>Customer Name</label>
                     <select name="customer_id" class="form-control" required>
                         <option value="" disabled selected>Enter customer name...</option>
-                        @foreach($customers as $c)
+                        @foreach ($customers as $c)
                             <option value="{{ $c->Customer_ID }}">{{ $c->Institution_Name }}</option>
                         @endforeach
                     </select>
@@ -395,7 +497,7 @@
                     <label>Product/Service</label>
                     <select id="quoteProductSelect" name="product_id" class="form-control" required onchange="updateQuoteUnitPrice(this)">
                         <option value="" disabled selected>Select Product...</option>
-                        @foreach($products as $p)
+                        @foreach ($products as $p)
                             <option value="{{ $p->Product_ID }}" data-price="{{ $p->Unit_Price_USD }}">{{ $p->Product_Name }}</option>
                         @endforeach
                     </select>
@@ -428,7 +530,7 @@
             <button class="btn btn-primary btn-solid-teal" onclick="submitNewQuotation(this)">Generate Quotation</button>
         `;
         const modal = createModal('Generate New Quotation', body, footer);
-        
+
         // Dynamic title update based on product
         const productSelect = modal.querySelector('#quoteProductSelect');
         productSelect.addEventListener('change', () => {
@@ -447,14 +549,15 @@
     async function submitNewQuotation(btn) {
         const modal = btn.closest('.modal-overlay');
         const form = modal.querySelector('#newQuotationForm');
-        
+
         const customerSelect = form.querySelector('[name="customer_id"]');
         const productSelect = form.querySelector('[name="product_id"]');
         const quantityInput = form.querySelector('[name="quantity"]');
         const priceInput = form.querySelector('[name="price"]');
-        
+
         // Clear previous errors
-        [customerSelect, productSelect, quantityInput, priceInput].forEach(el => el.classList.remove('error-border'));
+        [customerSelect, productSelect, quantityInput, priceInput].forEach(el => el.classList.remove(
+            'error-border'));
 
         if (!customerSelect.value) {
             showToast('Customer is required.', 'error');
@@ -489,13 +592,11 @@
             valid_until: form.querySelector('[name="valid_until"]').value,
             status: 'Draft',
             total_amount: priceInput.value * quantityInput.value, // This is expected in validation
-            items: [
-                {
-                    product_id: productSelect.value,
-                    quantity: quantityInput.value,
-                    price: priceInput.value
-                }
-            ]
+            items: [{
+                product_id: productSelect.value,
+                quantity: quantityInput.value,
+                price: priceInput.value
+            }]
         };
 
         btn.disabled = true;
@@ -504,7 +605,7 @@
         try {
             const response = await fetch('{{ route('admin.customers.quotation') }}', {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
                     'Accept': 'application/json'
@@ -531,7 +632,7 @@
         // Find existing quotation data for pre-filling
         const quotations = @json($quotations);
         const quote = quotations.find(q => q.Quotation_ID == quotationId);
-        
+
         const currentQty = quote?.line_items?.[0]?.Quantity || 1;
         const currentPrice = quote?.line_items?.[0]?.Unit_Price || 0;
 
@@ -601,7 +702,7 @@
         try {
             const response = await fetch(`/admin/quotations/${id}/revise`, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
                     'Accept': 'application/json'
@@ -628,13 +729,13 @@
         // Find existing quotation data for pre-filling
         const quotations = @json($quotations);
         const quote = quotations.find(q => q.Quotation_ID == id);
-        
+
         const statuses = ['Draft', 'Sent', 'Pending', 'Approved', 'Won', 'Lost'];
         let options = '';
         statuses.forEach(s => {
             options += `<option value="${s}" ${s === currentStatus ? 'selected' : ''}>${s}</option>`;
         });
-        
+
         const body = `
             <form id="statusUpdateForm" class="high-fidelity-form">
                 <input type="hidden" name="id" value="${id}">
@@ -684,12 +785,12 @@
         try {
             const response = await fetch(`/admin/quotations/${id}/status`, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
-                    'Accept': 'application/json' 
+                    'Accept': 'application/json'
                 },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     status: status,
                     status_notes: notes
                 })
@@ -714,7 +815,7 @@
         const quotations = @json($quotations);
         const selectedQuote = quotations.find(q => q.Quotation_ID == id);
         if (!selectedQuote) return;
-        
+
         // Find all versions by comparing the base Quotation_Number (without suffix)
         const baseNumber = selectedQuote.Quotation_Number.replace(/-V\d+$/, '');
         const versions = quotations
@@ -725,18 +826,24 @@
             .sort((a, b) => b.Version_Number - a.Version_Number);
 
         let body = `<div class="version-list">`;
-        
+
         versions.forEach(v => {
             const isCurrent = v.Quotation_ID === selectedQuote.Quotation_ID;
             const modifiedDate = new Date(v.updated_at).toLocaleDateString('en-US', {
-                month: 'short', day: 'numeric', year: 'numeric'
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
             });
             const modifiedTime = new Date(v.updated_at).toLocaleTimeString('en-US', {
-                hour: 'numeric', minute: '2-digit'
+                hour: 'numeric',
+                minute: '2-digit'
             });
             const creator = v.creator ? v.creator.name : 'System';
-            const amount = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(v.Total_Amount_PHP);
-            
+            const amount = new Intl.NumberFormat('en-PH', {
+                style: 'currency',
+                currency: 'PHP'
+            }).format(v.Total_Amount_PHP);
+
             // Extract change type from Additional_Notes if available
             let changes = v.Additional_Notes || 'Initial quotation created';
             if (changes.includes('Change Type:')) {
@@ -769,21 +876,21 @@
                 </div>
             `;
         });
-        
+
         body += `</div>`;
-        
+
         const footer = `
             <div style="flex: 1; color: #64748b; font-size: 0.9rem;">${versions.length} versions total</div>
             <button class="btn btn-primary btn-solid-teal close-modal">Close</button>
         `;
-        
+
         const header = `
             <div style="display: flex; flex-direction: column;">
                 <span>Quotation Version History</span>
                 <span style="font-size: 0.9rem; font-weight: 400; color: #64748b; margin-top: 4px;">${selectedQuote.Quotation_Number}</span>
             </div>
         `;
-        
+
         createModal(header, body, footer);
     }
 
@@ -805,7 +912,8 @@
         `;
 
         if (templates.length === 0) {
-            body += `<p style="font-size: 0.85rem; color: #94a3b8; text-align: center; padding: 12px;">No templates found.</p>`;
+            body +=
+                `<p style="font-size: 0.85rem; color: #94a3b8; text-align: center; padding: 12px;">No templates found.</p>`;
         } else {
             templates.forEach(t => {
                 body += `
@@ -916,7 +1024,7 @@
 
     async function deleteTemplate(id) {
         if (!confirm('Are you sure you want to delete this template?')) return;
-        
+
         try {
             const response = await fetch(`/admin/quotation-templates/${id}`, {
                 method: 'DELETE',
@@ -964,15 +1072,30 @@
             if (!quote) return;
 
             const customer = quote.customer?.Institution_Name || 'N/A';
-            const amount = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(quote.Total_Amount_PHP);
-            const created = new Date(quote.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            const expires = quote.Expiration_Date ? new Date(quote.Expiration_Date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A';
+            const amount = new Intl.NumberFormat('en-PH', {
+                style: 'currency',
+                currency: 'PHP'
+            }).format(quote.Total_Amount_PHP);
+            const created = new Date(quote.created_at).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+            const expires = quote.Expiration_Date ? new Date(quote.Expiration_Date).toLocaleDateString(
+                'en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                }) : 'N/A';
 
             let itemsHtml = '<div style="margin-top: 0.5rem;">';
             if (quote.line_items && quote.line_items.length > 0) {
                 quote.line_items.forEach((item, i) => {
                     const productName = item.product?.Product_Name || 'Unknown Product';
-                    const lineTotal = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(item.Line_Total || (item.Unit_Price * item.Quantity));
+                    const lineTotal = new Intl.NumberFormat('en-PH', {
+                        style: 'currency',
+                        currency: 'PHP'
+                    }).format(item.Line_Total || (item.Unit_Price * item.Quantity));
                     itemsHtml += `<div style="padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between;">
                         <span>${i + 1}. ${productName} × ${item.Quantity}</span>
                         <span style="font-weight: 600;">${lineTotal}</span>
@@ -1010,7 +1133,8 @@
             const id = this.getAttribute('data-doc-id');
             const name = this.getAttribute('data-doc-name');
 
-            const body = `<p style="color: var(--fin-slate); font-size: 0.95rem;">Are you sure you want to delete <strong>${name}</strong>?</p>
+            const body =
+                `<p style="color: var(--fin-slate); font-size: 0.95rem;">Are you sure you want to delete <strong>${name}</strong>?</p>
                 <div class="modal-notice"><p>This action will permanently remove the document. This cannot be undone.</p></div>`;
             const footer = `
                 <button class="btn btn-outline close-modal">Cancel</button>
@@ -1026,22 +1150,30 @@
         try {
             const response = await fetch(`/admin/documents/${id}`, {
                 method: 'DELETE',
-                headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                }
             });
             const result = await response.json();
             if (result.success) {
                 showToast('Document deleted successfully');
                 const item = document.querySelector(`.file-item[data-doc-id="${id}"]`);
-                if (item) { item.style.transition = 'opacity 0.3s'; item.style.opacity = '0'; setTimeout(() => item.remove(), 300); }
+                if (item) {
+                    item.style.transition = 'opacity 0.3s';
+                    item.style.opacity = '0';
+                    setTimeout(() => item.remove(), 300);
+                }
                 closeModal(btn.closest('.modal-overlay'));
             } else {
                 showToast(result.message || 'Delete failed', 'error');
-                btn.disabled = false; btn.innerText = 'Delete Document';
+                btn.disabled = false;
+                btn.innerText = 'Delete Document';
             }
         } catch (error) {
             showToast('Delete failed', 'error');
-            btn.disabled = false; btn.innerText = 'Delete Document';
+            btn.disabled = false;
+            btn.innerText = 'Delete Document';
         }
     }
-
 </script>

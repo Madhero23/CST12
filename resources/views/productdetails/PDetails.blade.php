@@ -234,6 +234,7 @@
         <form id="editProductForm" class="modal-form" enctype="multipart/form-data">
             @csrf
             @method('PUT')
+            <div id="edit_error_summary" style="display: none; background-color: #fef2f2; border: 1px solid #f87171; color: #b91c1c; padding: 12px; border-radius: 6px; margin-bottom: 16px; font-size: 14px;"></div>
             <input type="hidden" id="edit_product_id" name="product_id">
             
             <div class="form-row">
@@ -761,6 +762,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const productId = document.getElementById('edit_product_id').value;
         const formData = new FormData(this);
+        formData.append('_method', 'PUT'); // Explicitly append method for Laravel method spoofing
+        
+        // Hide previous errors
+        const errorSummary = document.getElementById('edit_error_summary');
+        if (errorSummary) errorSummary.style.display = 'none';
+
         const submitBtn = this.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
         submitBtn.textContent = 'Updating...';
@@ -770,7 +777,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'X-HTTP-Method-Override': 'PUT',
                     'Accept': 'application/json',
                 },
                 body: formData
@@ -778,11 +784,25 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const data = await response.json();
             
-            if (data.success) {
+            if (response.ok && data.success) {
                 alert(data.message);
                 closeModal('editProductModal');
                 if (!data.no_changes) {
                     location.reload();
+                }
+            } else if (response.status === 422) {
+                // Validation Error Handling
+                let errorHtml = '<strong>Please fix the following validation errors:</strong><ul style="margin-top: 5px; margin-bottom: 0; padding-left: 20px;">';
+                for (let field in data.errors) {
+                    errorHtml += `<li>${data.errors[field][0]}</li>`;
+                }
+                errorHtml += '</ul>';
+                
+                if (errorSummary) {
+                    errorSummary.innerHTML = errorHtml;
+                    errorSummary.style.display = 'block';
+                } else {
+                    alert('Validation Error:\n' + Object.values(data.errors).map(e => e[0]).join('\n'));
                 }
             } else {
                 alert('Error: ' + (data.message || 'Failed to update product'));
