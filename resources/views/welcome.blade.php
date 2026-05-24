@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +10,8 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap"
+        rel="stylesheet">
 
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -222,7 +224,7 @@
             color: var(--secondary-color);
         }
 
-        /* ===== Inline Validation Error (FR-AUTH-03) ===== */
+        /* ===== Inline Validation Error ===== */
         .field-error {
             color: var(--red-accent);
             font-size: 12px;
@@ -236,7 +238,7 @@
             font-size: 11px;
         }
 
-        /* ===== Generic Login Error Alert (FR-AUTH-02) ===== */
+        /* ===== Generic Login Error Alert ===== */
         .login-alert {
             background: rgba(220, 20, 60, 0.08);
             border: 1px solid rgba(220, 20, 60, 0.2);
@@ -368,6 +370,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -392,6 +395,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <div class="login-container">
@@ -407,8 +411,8 @@
                 <p>Sign in to admin panel</p>
             </div>
 
-            {{-- FR-AUTH-02: Generic login error message --}}
-            @if($errors->has('login'))
+            {{-- Generic login error message --}}
+            @if ($errors->has('login'))
                 <div class="login-alert">
                     <i class="fas fa-exclamation-circle"></i>
                     <span>{{ $errors->first('login') }}</span>
@@ -423,15 +427,11 @@
                     <label for="Username">Username</label>
                     <div class="input-wrapper">
                         <i class="fas fa-user field-icon"></i>
-                        <input type="text"
-                               id="Username"
-                               name="Username"
-                               placeholder="Enter your username"
-                               value="{{ old('Username') }}"
-                               autocomplete="username"
-                               class="{{ $errors->has('Username') ? 'input-error' : '' }}">
+                        <input type="text" id="Username" name="Username" placeholder="Enter your username"
+                            value="{{ old('Username') }}" autocomplete="username"
+                            class="{{ $errors->has('Username') ? 'input-error' : '' }}">
                     </div>
-                    {{-- FR-AUTH-03: Inline validation error for Username --}}
+                    {{-- Inline validation error for Username --}}
                     @error('Username')
                         <div class="field-error">
                             <i class="fas fa-exclamation-circle"></i>
@@ -444,17 +444,14 @@
                     <label for="Password">Password</label>
                     <div class="input-wrapper">
                         <i class="fas fa-lock field-icon"></i>
-                        <input type="password"
-                               id="Password"
-                               name="Password"
-                               placeholder="Enter your password"
-                               autocomplete="current-password"
-                               class="{{ $errors->has('Password') ? 'input-error' : '' }}">
-                        <button type="button" class="toggle-password" id="togglePassword" aria-label="Toggle password visibility">
+                        <input type="password" id="Password" name="Password" placeholder="Enter your password"
+                            autocomplete="current-password" class="{{ $errors->has('Password') ? 'input-error' : '' }}">
+                        <button type="button" class="toggle-password" id="togglePassword"
+                            aria-label="Toggle password visibility">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
-                    {{-- FR-AUTH-03: Inline validation error for Password --}}
+                    {{-- Inline validation error for Password --}}
                     @error('Password')
                         <div class="field-error">
                             <i class="fas fa-exclamation-circle"></i>
@@ -468,7 +465,7 @@
                         <input type="checkbox" name="remember">
                         <span>Remember me</span>
                     </label>
-                    <a href="#" class="forgot-link">Forgot password?</a>
+                    {{-- <a href="#" class="forgot-link">Forgot password?</a> --}}
                 </div>
 
                 <button type="submit" class="btn-login" id="btnLogin">
@@ -490,7 +487,7 @@
 
     <script>
         // Toggle password visibility
-        document.getElementById('togglePassword').addEventListener('click', function () {
+        document.getElementById('togglePassword').addEventListener('click', function() {
             const passwordInput = document.getElementById('Password');
             const icon = this.querySelector('i');
             if (passwordInput.type === 'password') {
@@ -504,4 +501,5 @@
     </script>
 
 </body>
+
 </html>
