@@ -1,1 +1,1 @@
-web: php artisan migrate:fresh --force && php artisan db:seed --force && /start-container.sh
+web: touch /app/database/database.sqlite && php artisan migrate:fresh --force && php artisan db:seed --force && /start-container.sh
