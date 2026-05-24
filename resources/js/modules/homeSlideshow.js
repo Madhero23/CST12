@@ -230,11 +230,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const images = JSON.parse(heroElement.dataset.images || '[]');
 
     // If no images in data attribute, use default ones
-    const defaultImages = window.heroImages || [
-        '{{ asset('hero0.png') }}',
-        '{{ asset('hero1.png') }}',
-        '{{ asset('hero2.png') }}',
-        '{{ asset('hero3.png') }}'
+        const defaultImages = window.heroImages || [
+        '/hero0.png',
+        '/hero1.png',
+        '/hero2.png',
     ];
 
     const slideshow = new HomeSlideshow('hero-slideshow', images.length ? images : defaultImages, {
